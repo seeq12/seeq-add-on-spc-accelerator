@@ -71,7 +71,8 @@ def format_histogram_worksheet(histogram_id, signal_name, URL, workbook_id):
     wb = spy.workbooks.pull(URL, quiet=True)
     
     try:
-        ws= wb[0].worksheets[f'My Folder >> {wb[0]['Name']} >> ' + f'{signal_name} Histogram']
+        wb_name = wb[0]['Name']
+        ws= wb[0].worksheets[f'My Folder >> {wb_name} >> {signal_name} Histogram']
     except:
         for sheet in wb[0].worksheets:
             if sheet['Name'] == f'{signal_name} Histogram':
