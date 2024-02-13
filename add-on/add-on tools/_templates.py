@@ -64,19 +64,17 @@ def create_template(URL, display_dict, histogram, input_condition, start_select,
         
 def format_histogram_worksheet(histogram_id, signal_name, URL, workbook_id):
     workbooks_api = sdk.WorkbooksApi(spy.client)
-    formulaAPI = sdk.FormulasApi(spy.client)
-    itemsAPI = sdk.ItemsApi(spy.client)
     
     histogram = spy.search({'Scoped To': workbook_id,
-                       'Name':'{}: Mean'.format(signal_name)}, quiet=True, all_properties=True)
-    push_histogram = spy.push(metadata=histogram, workbook=workbook_id, worksheet='{} Histogram'.format(signal_name), errors='catalog', quiet=True)
+                       'Name':f'{signal_name}: Mean'}, quiet=True, all_properties=True)
+    push_histogram = spy.push(metadata=histogram, workbook=workbook_id, worksheet=f'{signal_name} Histogram', errors='catalog', quiet=True)
     wb = spy.workbooks.pull(URL, quiet=True)
     
     try:
-        ws= wb[0].worksheets['My Folder >> {} >> '.format(wb[0]['Name']) + '{} Histogram'.format(signal_name)]
+        ws= wb[0].worksheets[f'My Folder >> {wb[0]['Name']} >> ' + f'{signal_name} Histogram']
     except:
         for sheet in wb[0].worksheets:
-            if sheet['Name'] == '{} Histogram'.format(signal_name):
+            if sheet['Name'] == f'{signal_name} Histogram':
                 ws = sheet
           
     ws.display_items = pd.DataFrame(columns=['Name', 'Type', 'ID'])

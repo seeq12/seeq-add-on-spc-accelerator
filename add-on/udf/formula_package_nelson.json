@@ -1,0 +1,252 @@
+{
+    "formulaPackage": {
+        "name": "NelsonRunRules",
+        "creatorName": "Christopher Harp",
+        "creatorContactInfo": "christopher.harp@seeq.com"
+    },
+    "functions": [
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441ea",
+            "name": "RunRule1",
+            "description": "<p>Nelson Run Rule One. This function creates a condition when any single data point falls outside the control limits from the centerline (i.e., any point that falls outside Zone A, beyond either the upper or lower control limit).</p>",
+            "formula": "// Nelson Run Rule One: Any single data point falls outside the control limits from the centerline.\n$signal > $ucl or $signal < $lcl",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "minus3sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "plus3sd",
+                    "formula": "1.toSignal()"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441eb",
+            "name": "RunRule2",
+            "description": "<p>Nelson Run Rule Two. This function creates a condition when two out of three consecutive points fall beyond the 2σ-limit (in Zone A or beyond), on the same side of the centerline.</p>",
+            "formula": "// Nelson Run Rule Two: Two out of three consecutive points fall beyond the 2σ-limit.\n(abs($signal - $signal.shift(1)) > 2 * $signal.stddev() and abs($signal.shift(1) - $signal.shift(2)) > 2 * $signal.stddev())",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "mean",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441ec",
+            "name": "RunRule3",
+            "description": "<p>Nelson Run Rule Three. This function creates a condition when four out of five consecutive points fall beyond the 1σ-limit (in Zone A or beyond), on the same side of the centerline.</p>",
+            "formula": "// Nelson Run Rule Three: Four out of five consecutive points fall beyond the 1σ-limit.\n(abs($signal - $signal.shift(1)) > $signal.stddev() and abs($signal.shift(1) - $signal.shift(2)) > $signal.stddev() and abs($signal.shift(2) - $signal.shift(3)) > $signal.stddev() and abs($signal.shift(3) - $signal.shift(4)) > $signal.stddev())",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441ed",
+            "name": "RunRule4",
+            "description": "<p>Nelson Run Rule Four. This function creates a condition when two out of three consecutive points are more than 2σ from the centerline in the same direction.</p>",
+            "formula": "// Nelson Run Rule Four: Two out of three consecutive points are more than 2σ from the centerline.\n(abs($signal - $signal.shift(1)) > 2 * $signal.stddev() and abs($signal.shift(1) - $signal.shift(2)) > 2 * $signal.stddev())",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441ee",
+            "name": "RunRule5",
+            "description": "<p>Nelson Run Rule Five. This function creates a condition when four out of five consecutive points are more than 1σ from the centerline in the same direction.</p>",
+            "formula": "// Nelson Run Rule Five: Four out of five consecutive points are more than 1σ from the centerline.\n(abs($signal - $signal.shift(1)) > $signal.stddev() and abs($signal.shift(1) - $signal.shift(2)) > $signal.stddev() and abs($signal.shift(2) - $signal.shift(3)) > $signal.stddev() and abs($signal.shift(3) - $signal.shift(4)) > $signal.stddev())",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "minus2sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "plus2sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441ef",
+            "name": "RunRule6",
+            "description": "<p>Nelson Run Rule Six. This function creates a condition when nine consecutive points fall on the same side of the centerline.</p>",
+            "formula": "// Nelson Run Rule Six: Nine consecutive points fall on the same side of the centerline.\n(sum($signal > $signal.mean() + 1 * $signal.stddev()) >= 9 or sum($signal < $signal.mean() - 1 * $signal.stddev()) >= 9)",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "minus1sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "plus1sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441f0",
+            "name": "RunRule7",
+            "description": "<p>Nelson Run Rule Seven. This function creates a condition when 14 consecutive points alternate up and down.</p>",
+            "formula": "// Nelson Run Rule Seven: 14 consecutive points alternate up and down.\n(sum($signal > $signal.shift(1)) >= 7 and sum($signal.shift(1) > $signal.shift(2)) >= 7)",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "minus1sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "plus1sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        },
+        {
+            "id": "f253c5ca-6eed-43e0-993e-5696ecd441f2",
+            "name": "RunRule8",
+            "description": "<p>Nelson Run Rule Eight. This function creates a condition when a shift of 6 or more points in a row exists, all increasing or all decreasing.</p>",
+            "formula": "//Create step-interpolated signal to keep from capturing the linear interpolation between sample points\n$signalStep = $signal.toStep($maxinterp)\n\n//Create capsules for every 7 samples ($toCapsulesbyCount) and for every sample ($toCapsules)\n$toCapsulesbyCount = $signalStep.toCapsulesByCount(7, 7*$maxinterp) //set the maximum duration based on the longest time you would expect to collect 7 samples\n$toCapsules = $signalStep.toCapsules()\n\n//Create condition for when the signal is increasing or decreasing\n$condIncreasing = ($signalStep.runningDelta() > 0)\n$condDecreasing = ($signalStep.runningDelta() < 0)\n\n//Within 7 data points ($toCapsulesbyCount), count how many sample points ($toCapsules) are increasing or decreasing\n$countIncreasing = $toCapsules.touches($condIncreasing).aggregate(count(), $toCapsulesbyCount, durationKey())\n$countDecreasing = $toCapsules.touches($condDecreasing).aggregate(count(), $toCapsulesbyCount, durationKey())\n\n//Find when 6+ out of 7 points are continuously increasing or decreasing\n//by setting the count as a property on $toCapsulesbyCount and keeping only capsules greater than or equal to 6\n$RR8Increasing = $toCapsulesbyCount.setProperty('Run Rule 8 Violations', $countIncreasing, endvalue())\n  .keep('Run Rule 8 Violations', isGreaterThanOrEqualto(6))\n$RR8Decreasing = $toCapsulesbyCount.setProperty('Run Rule 8 Violations', $countDecreasing, endvalue())\n  .keep('Run Rule 8 Violations', isGreaterThanOrEqualto(6))\n\n//Find every sample point capsule that touches a run rule violation capsule\n//Combine increasing and decreasing into one condition and use merge to combine overlapping capsules and to remove properties\n$toCapsules.touches($RR8Increasing or $RR8Decreasing).merge(true)",
+            "type": "UserDefinedFormulaFunction",
+            "parameters": [
+                {
+                    "unbound": true,
+                    "name": "signal",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "minus1sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "plus1sd",
+                    "formula": "1.toSignal()"
+                },
+                {
+                    "unbound": true,
+                    "name": "maxinterp",
+                    "formula": "1d"
+                }
+            ]
+        }
+    ],
+    "docs": [
+        {
+            "name": "index",
+            "description": "Allows creation of the Nelson Run Rules. Created based on Nelson Run Rules.",
+            "title": "Nelson Run Rules",
+            "examples": [
+                {
+                    "description": "Find when a sample point in a signal is above or below the control limits of +/-3 standard deviations from the mean.",
+                    "formula": "$signal.NelsonRunRule1($ucl, $lcl)"
+                },
+                {
+                    "description": "Find when a signal has 2 out 3 points above or below the +/-2 standard deviation limits.",
+                    "formula": "$signal.NelsonRunRule2()"
+                },
+                {
+                    "description": "Find when a signal has 4 out of 5 points above or below the +/-1 standard deviation limits.",
+                    "formula": "$signal.NelsonRunRule3()"
+                },
+                {
+                    "description": "Find when two out of three consecutive points are more than 2σ from the centerline.",
+                    "formula": "$signal.NelsonRunRule4()"
+                },
+                {
+                    "description": "Find when four out of five consecutive points are more than 1σ from the centerline.",
+                    "formula": "$signal.NelsonRunRule5()"
+                },
+                {
+                    "description": "Find when nine consecutive points fall on the same side of the centerline.",
+                    "formula": "$signal.NelsonRunRule6()"
+                },
+                {
+                    "description": "Find when 14 consecutive points alternate up and down.",
+                    "formula": "$signal.NelsonRunRule7()"
+                },
+                {
+                    "description": "Find when a signal has 6 or more consecutive points increasing or decreasing.",
+                    "formula": "$signal.RunRule8($maxinterp)"
+                }
+            ]
+        }
+    ]
+}

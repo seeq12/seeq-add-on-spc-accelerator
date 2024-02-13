@@ -13,7 +13,10 @@ class SPCAccelerator:
         self.app = v.App(id="SPC Accelerator")
         self.output_results = ipw.Output
         try:
-            self.signal_list, self.condition_list, self.start_time, self.end_time, self.signals, self.conditions = pull_worksheet_data(self.URL, self.workbook_id, self.worksheet_id)
+            (
+                self.signal_list, self.condition_list, self.start_time, self.end_time, 
+                self.signals, self.conditions
+                ) = pull_worksheet_data(self.URL, self.workbook_id, self.worksheet_id)
         except Exception as e:
             self.display_error_widget(str(e))
             
@@ -23,16 +26,16 @@ class SPCAccelerator:
             self.control_chart, self.we_runrules, self.nelson_runrules, self.histogram, 
             self.button, self.workbook_button, self.error, self.success
         ) = frontend(self.signal_list, self.condition_list, self.start_time, self.end_time)
-        self.button.on_event('click', lambda widget, event, data: self.create_control_chart())
+        self.button.on_event('click', lambda widget, event, data: self.input_validation())
         self.input_condition.on_event('change', lambda widget, event, data: check_properties(self.apply_to_condition, self.condition_list, self.conditions, self.start_select, self.end_select, self.capsule_properties ))
         
-    def create_control_chart(self):
+    def input_validation(self):
         self.success.value=False
         self.input_signal = check_input_signal(self.input_signal)
         self.error = check_training_window(self.end_select, self.start_select, self.error)
         
         if (self.input_signal.error == False) and (self.error.value == False):
-            self.workbook_button, self.success, self.button = do_stuff(self)
+            self.workbook_button, self.success, self.button = create_control_chart(self)
         
     def display_error_widget(self, error_message):
         error_widget = ipw.HBox([

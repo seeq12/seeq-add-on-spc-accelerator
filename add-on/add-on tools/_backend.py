@@ -10,7 +10,7 @@ workbooks_api = sdk.WorkbooksApi(spy.client)
 formulaAPI = sdk.FormulasApi(spy.client)
 itemsAPI = sdk.ItemsApi(spy.client)
 
-def do_stuff(*args):
+def create_control_chart(*args):
     if len(args) == 1:
         instance = args[0]
         URL = instance.URL
@@ -38,12 +38,6 @@ def do_stuff(*args):
         error = instance.error
         success = instance.success
         input_condition = instance.input_condition
-        
-    else:
-        # Handle case where incorrect number of arguments are passed
-        print("Error: Incorrect number of arguments passed to do_stuff")
-        
-    workbooks_api = sdk.WorkbooksApi(spy.client)
     
     workbook_button.disabled = True
     button.disabled = True
@@ -61,45 +55,51 @@ def do_stuff(*args):
     histogram_dict = {}
     for signal_name in input_signal.v_model:
         #Create and push average and standard deviation formulas
-        average_formula_string = create_mean_formula_string(capsule_start, capsule_end, input_condition, capsule_property, conditions, start_select, end_select)
+        average_formula_string = create_mean_formula_string(
+            capsule_start, capsule_end, input_condition, capsule_property, 
+            conditions, start_select, end_select
+            )
         stddev_formula_string = create_stddev_formula_string(average_formula_string)
-        mean_stddev_signal_df = create_mean_and_stddev_signals(average_formula_string, stddev_formula_string, signal_name, input_condition, signals, conditions, apply_to_condition)
-        mean_stddev_push_df = push_signals(mean_stddev_signal_df, workbook_id, '{} Control Chart'.format(signal_name))
+        mean_stddev_signal_df = create_mean_and_stddev_signals(
+            average_formula_string, stddev_formula_string, signal_name, input_condition, 
+            signals, conditions, apply_to_condition
+            )
+        mean_stddev_push_df = push_signals(mean_stddev_signal_df, workbook_id, f'{signal_name} Control Chart')
 
         #Create and push 1, 2, and 3 sigma limits
         limits_df = create_limit_signals(mean_stddev_push_df, signal_name)
-        limits_push_df = push_signals(limits_df, workbook_id, '{} Control Chart'.format(signal_name))
+        limits_push_df = push_signals(limits_df, workbook_id, f'{signal_name} Control Chart')
         created_string = 'Control Chart'
-        control_chart_signal_list = [mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)].ID.iloc[0]]
+        control_chart_signal_list = [mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'].ID.iloc[0]]
         control_chart_signal_list += limits_push_df.ID.to_list()
         control_chart_signal_list += [signals[signals['Name'] == signal_name].ID.iloc[0]]
         if isinstance(input_condition.v_model, str):
             control_chart_signal_list += [conditions[conditions['Name'] == apply_to_condition.v_model].ID.iloc[0]]
-        display_dict['{} Control Chart'.format(signal_name)] = control_chart_signal_list
+        display_dict[f'{signal_name} Control Chart'] = control_chart_signal_list
 
         #Create Western Electric Run Rules
         if we_runrules.v_model == True:
             western_electric_rules_df = western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals)
-            western_electric_push_df = push_signals(western_electric_rules_df, workbook_id, '{} Western Electric Run Rules'.format(signal_name))
+            western_electric_push_df = push_signals(western_electric_rules_df, workbook_id, f'{signal_name} Western Electric Run Rules')
             if (nelson_runrules.v_model == True) or (histogram.v_model == True):
                 created_string += ', Western Electric Run Rules, '
             else: 
                 created_string += ' and Western Electric Run Rules'
             western_electric_signal_list = control_chart_signal_list.copy()
             western_electric_signal_list += western_electric_push_df.ID.to_list()
-            display_dict['{} Western Electric Run Rules'.format(signal_name)] = western_electric_signal_list
+            display_dict[f'{signal_name} Western Electric Run Rules'] = western_electric_signal_list
 
         #Create Nelson Run Rules
         if nelson_runrules.v_model == True:
             nelson_rules_df = nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals)
-            nelson_push_df = push_signals(nelson_rules_df, workbook_id, '{} Nelson Run Rules'.format(signal_name))
+            nelson_push_df = push_signals(nelson_rules_df, workbook_id, f'{signal_name} Nelson Run Rules')
             if histogram.v_model == True:
                 created_string += 'Nelson Run Rules, '
             else: 
                 created_string += ' and Nelson Run Rules'
             nelson_signal_list = control_chart_signal_list.copy()
             nelson_signal_list += nelson_push_df.ID.to_list()
-            display_dict['{} Nelson Run Rules'.format(signal_name)] = nelson_signal_list
+            display_dict[f'{signal_name} Nelson Run Rules'] = nelson_signal_list
         if num_completed == 0:
             signals_completed += signal_name
         else:
@@ -109,26 +109,38 @@ def do_stuff(*args):
         if histogram.v_model == True:
             if isinstance(input_condition.v_model, str):
                 within_signal_df = within_condition_signal_df(signal_name, input_condition, signals, conditions)
-                within_signal_push_df = push_signals(within_signal_df, workbook_id, '{} Histogram'.format(signal_name))
-                histogram_id = create_histogram(within_signal_push_df, start_select.value.isoformat(), end_select.value.isoformat(), input_condition, conditions, workbook_id, capsule_property)
+                within_signal_push_df = push_signals(within_signal_df, workbook_id, f'{signal_name} Histogram')
+                histogram_id = create_histogram(
+                    within_signal_push_df, start_select.value.isoformat(), end_select.value.isoformat(), 
+                    input_condition, conditions, workbook_id, capsule_property
+                    )
             else:
-                histogram_id = create_histogram(signals[signals['Name'] == signal_name], start_select.value.isoformat(), end_select.value.isoformat(),input_condition, conditions, workbook_id, capsule_property)
+                histogram_id = create_histogram(
+                    signals[signals['Name'] == signal_name], start_select.value.isoformat(), end_select.value.isoformat(),
+                    input_condition, conditions, workbook_id, capsule_property
+                    )
             format_histogram_worksheet(histogram_id, signal_name, URL, workbook_id)
-            histogram_dict['{} Histogram'.format(signal_name)] = histogram_id
+            histogram_dict[f'{signal_name} Histogram'] = histogram_id
             created_string += ' and Histogram'
         num_completed += 1
-        success.children = ['{} of {} signals completed. Created {} for {}.'.format(str(num_completed), len(input_signal.v_model), created_string, signals_completed)]
+        success.children = [f"{num_completed} of {len(input_signal.v_model)} signals completed. Created {created_string} for {signals_completed}."]
         success.value=True
 
     #Edit the worksheet(s) display(s) to specify formatting
-    success.children = ['{} of {} signals completed. Created {} for {}. Formatting worksheets...'.format(str(num_completed), len(input_signal.v_model), created_string, signal_name, signals_completed)]
+    success.children = [f"{num_completed} of {len(input_signal.v_model)} signals completed. Created {created_string} for {signal_name}. Formatting worksheets..."]
 
-    worksheet_data_dict = create_template(URL, display_dict, histogram, input_condition, start_select, end_select, workbook_button, workbook_id, worksheet_id, histogram_dict)
+    worksheet_data_dict = create_template(
+        URL, display_dict, histogram, input_condition, 
+        start_select, end_select, workbook_button, workbook_id, 
+        worksheet_id, histogram_dict
+        )
     
     replaced_worksheet_data = json.dumps(worksheet_data_dict)
-    workbooks_api.create_workstep(workbook_id=workbook_id, worksheet_id=worksheet_id,body={"data": replaced_worksheet_data})
+    workbooks_api.create_workstep(
+        workbook_id=workbook_id, worksheet_id=worksheet_id,body={"data": replaced_worksheet_data}
+        )
     
-    success.children =success.children = [f'''{num_completed} of {len(input_signal.v_model)} signals completed. Created {created_string} for {signal_name}. 
+    success.children = [f'''{num_completed} of {len(input_signal.v_model)} signals completed. Created {created_string} for {signal_name}. 
         Formatting complete. Click link to be taken to the results.''']
 
     workbook_button.disabled = False
@@ -148,7 +160,12 @@ def disable_apply_to_condition(apply_to_condition, input_condition):
 def check_properties(apply_to_condition, input_condition, conditions, start_select, end_select, capsule_property):
     if isinstance(input_condition.v_model, str):
         apply_to_condition.disabled = False
-        capsules = spy.pull(conditions[conditions['Name'] == input_condition.v_model], start=start_select.value, end=end_select.value, quiet=True)
+        capsules = spy.pull(
+            conditions[conditions['Name'] == input_condition.v_model], 
+            start=start_select.value, 
+            end=end_select.value, 
+            quiet=True
+            )
         property_list = capsules.columns.to_list()
         property_list = [s for s in property_list if s!='Condition']
         property_list = [s for s in property_list if s!='Capsule Start']
@@ -181,7 +198,7 @@ def create_mean_formula_string(capsule_start, capsule_end, input_condition, caps
     if isinstance(capsule_property.v_model, str):
         capsules = spy.pull(conditions[conditions['Name'] == input_condition.v_model], start=start_select.value, end=end_select.value, quiet=True)
         unique_properties = capsules[capsule_property.v_model].unique().tolist()
-        capsule_string = "//Define the time period that contains all in control capsules\n$capsule = capsule('{}', '{}')".format(capsule_start, capsule_end)
+        capsule_string = f"//Define the time period that contains all in control capsules\n$capsule = capsule('{capsule_start}', '{capsule_end}')"
         in_control_string = "\n \n//Narrow down data to when process is in control, use keep() to filter the condition by the specific grade code capsule property\n"
         unweighted_average_string = "\n \n//Create average based on the times the product is in control, use .toDiscrete to create an unweighted average\n"
         output_string = "\n \n//Create average for all grades in one signal using splice(), use keep() to filter the condition by the specific grade code capsule property\n//use within() to show only average only during the condition\n0"
@@ -193,20 +210,20 @@ def create_mean_formula_string(capsule_start, capsule_end, input_condition, caps
             else:
                 property_text = 'a'+str(prop).replace('.', '')
                 prop_match = prop
-            in_control_string += "${} = $applytocondition.keep('{}', isMatch({})).intersect($inputcondition)\n".format(property_text, capsule_property.v_model, prop_match)
-            unweighted_average_string += "${}_average = $inputsignal.remove(not ${}).toDiscrete().average($capsule)".format(property_text, property_text)
-            output_string += ".splice(${}_average, $applytocondition.keep('{}', isMatch({})))\n".format(property_text, capsule_property.v_model, prop_match)
+            in_control_string += f"${property_text} = $applytocondition.keep('{capsule_property.v_model}', isMatch({prop_match})).intersect($inputcondition)\n"
+            unweighted_average_string += f"${property_text}_average = $inputsignal.remove(not ${property_text}).toDiscrete().average($capsule)"
+            output_string += f".splice(${property_text}_average, $applytocondition.keep('{capsule_property.v_model}', isMatch({prop_match})))\n"
         output_string += ".within($applytocondition)"
         average_formula_string = capsule_string+in_control_string+unweighted_average_string+output_string
     elif isinstance(input_condition.v_model, str):
-        capsule_string = "//Define the time period that contains all in control capsules\n$capsule = capsule('{}', '{}')".format(capsule_start, capsule_end)
+        capsule_string = f"//Define the time period that contains all in control capsules\n$capsule = capsule('{capsule_start}', '{capsule_end}')"
         unweighted_average_string = "\n \n//Create average based on the times the product is in control, use .toDiscrete to create an unweighted average\n"
         unweighted_average_string += "$average = $inputsignal.remove(not $applytocondition.intersect($inputcondition)).toDiscrete().average($capsule).tosignal()"
         output_string = "\n \n//Create average using within() to show only average only during the condition\n"
         output_string += "$average.within($applytocondition)"
         average_formula_string = capsule_string+unweighted_average_string+output_string
     else:
-        capsule_string = "//Define the time period that contains all in control capsules\n$capsule = capsule('{}', '{}')".format(capsule_start, capsule_end)
+        capsule_string = f"//Define the time period that contains all in control capsules\n$capsule = capsule('{capsule_start}', '{capsule_end}')"
         unweighted_average_string = "\n \n//Create average based on the times within the training window, use .toDiscrete to create an unweighted average\n"
         unweighted_average_string += "$inputsignal.toDiscrete().average($capsule).tosignal()"
         average_formula_string = capsule_string+unweighted_average_string
@@ -224,7 +241,7 @@ def push_signals(push_df, workbook_id, worksheet_name):
 def create_mean_and_stddev_signals(average_formula_string, stddev_formula_string, signal_name, input_condition, signals, conditions, apply_to_condition):
     if isinstance(input_condition.v_model, str):
         mean_stddev_signal_df = pd.DataFrame([{
-            'Name': '{}: Mean'.format(signal_name),
+            'Name': f'{signal_name}: Mean',
             'Type': 'Signal',
             'Formula': average_formula_string,
             'Formula Parameters': {
@@ -233,7 +250,7 @@ def create_mean_and_stddev_signals(average_formula_string, stddev_formula_string
                 '$applytocondition': conditions[conditions['Name'] == apply_to_condition.v_model]
             }
         },{
-            'Name': '{}: Standard Deviation'.format(signal_name),
+            'Name': f'{signal_name}: Standard Deviation',
             'Type': 'Signal',
             'Formula': stddev_formula_string,
             'Formula Parameters': {
@@ -245,14 +262,14 @@ def create_mean_and_stddev_signals(average_formula_string, stddev_formula_string
         ])
     else:
         mean_stddev_signal_df = pd.DataFrame([{
-            'Name': '{}: Mean'.format(signal_name),
+            'Name': f'{signal_name}: Mean',
             'Type': 'Signal',
             'Formula': average_formula_string,
             'Formula Parameters': {
                 '$inputsignal': signals[signals['Name'] == signal_name]
             }
         },{
-            'Name': '{}: Standard Deviation'.format(signal_name),
+            'Name': f'{signal_name}: Standard Deviation',
             'Type': 'Signal',
             'Formula': stddev_formula_string,
             'Formula Parameters': {
@@ -264,52 +281,52 @@ def create_mean_and_stddev_signals(average_formula_string, stddev_formula_string
 
 def create_limit_signals(mean_stddev_push_df, signal_name):
     limits_df = pd.DataFrame([{
-        'Name': '{}: +1 Sigma'.format(signal_name),
+        'Name': f'{signal_name}: +1 Sigma',
         'Type': 'Signal',
         'Formula': "$Mean + 1*$StandardDeviation",
         'Formula Parameters': {
-            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)],
-            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Standard Deviation'.format(signal_name)]
+            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'],
+            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Standard Deviation']
         }
     },{
-        'Name': '{}: -1 Sigma'.format(signal_name),
+        'Name': f'{signal_name}: -1 Sigma',
         'Type': 'Signal',
         'Formula': "$Mean - 1*$StandardDeviation",
         'Formula Parameters': {
-            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)],
-            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Standard Deviation'.format(signal_name)]
+            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'],
+            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Standard Deviation']
         }
     },{
-        'Name': '{}: +2 Sigma'.format(signal_name),
+        'Name': f'{signal_name}: +2 Sigma',
         'Type': 'Signal',
         'Formula': "$Mean + 2*$StandardDeviation",
         'Formula Parameters': {
-            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)],
-            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Standard Deviation'.format(signal_name)]
+            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'],
+            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Standard Deviation']
         }
     },{
-        'Name': '{}: -2 Sigma'.format(signal_name),
+        'Name': f'{signal_name}: -2 Sigma',
         'Type': 'Signal',
         'Formula': "$Mean - 2*$StandardDeviation",
         'Formula Parameters': {
-            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)],
-            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Standard Deviation'.format(signal_name)]
+            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'],
+            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Standard Deviation']
         }
     },{
-        'Name': '{}: +3 Sigma'.format(signal_name),
+        'Name': f'{signal_name}: +3 Sigma',
         'Type': 'Signal',
         'Formula': "$Mean + 3*$StandardDeviation",
         'Formula Parameters': {
-            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)],
-            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Standard Deviation'.format(signal_name)]
+            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'],
+            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Standard Deviation']
         }
     },{
-        'Name': '{}: -3 Sigma'.format(signal_name),
+        'Name': f'{signal_name}: -3 Sigma',
         'Type': 'Signal',
         'Formula': "$Mean - 3*$StandardDeviation",
         'Formula Parameters': {
-            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)],
-            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Standard Deviation'.format(signal_name)]
+            '$Mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean'],
+            '$StandardDeviation': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Standard Deviation']
         }
     }
     ])
@@ -317,39 +334,39 @@ def create_limit_signals(mean_stddev_push_df, signal_name):
 
 def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals):
     western_electric_rules_df = pd.DataFrame([{
-        'Name': '{}: Western Electric Run Rule 1'.format(signal_name),
+        'Name': f'{signal_name}: Western Electric Run Rule 1',
         'Type': 'Condition',
         'Formula': "$inputsignal.WesternElectric_RunRule1($minus3sd, $plus3sd)",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus3sd': limits_push_df[limits_push_df['Name'] == '{}: -3 Sigma'.format(signal_name)],
-            '$plus3sd': limits_push_df[limits_push_df['Name'] == '{}: +3 Sigma'.format(signal_name)]
+            '$minus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -3 Sigma'],
+            '$plus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +3 Sigma']
         }
     },{
-        'Name': '{}: Western Electric Run Rule 2'.format(signal_name),
+        'Name': f'{signal_name}: Western Electric Run Rule 2',
         'Type': 'Condition',
         'Formula': "$inputsignal.WesternElectric_RunRule2($minus2sd, $plus2sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus2sd': limits_push_df[limits_push_df['Name'] == '{}: -2 Sigma'.format(signal_name)],
-            '$plus2sd': limits_push_df[limits_push_df['Name'] == '{}: +2 Sigma'.format(signal_name)]
+            '$minus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -2 Sigma'],
+            '$plus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +2 Sigma']
         }
     },{
-        'Name': '{}: Western Electric Run Rule 3'.format(signal_name),
+        'Name': f'{signal_name}: Western Electric Run Rule 3',
         'Type': 'Condition',
         'Formula': "$inputsignal.WesternElectric_RunRule3($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus1sd': limits_push_df[limits_push_df['Name'] == '{}: -1 Sigma'.format(signal_name)],
-            '$plus1sd': limits_push_df[limits_push_df['Name'] == '{}: +1 Sigma'.format(signal_name)]
+            '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
+            '$plus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +1 Sigma']
         }
     },{
-        'Name': '{}: Western Electric Run Rule 4'.format(signal_name),
+        'Name': f'{signal_name}: Western Electric Run Rule 4',
         'Type': 'Condition',
         'Formula': "$inputsignal.WesternElectric_RunRule4($mean, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)]
+            '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean']
         }
     }
     ])
@@ -357,71 +374,71 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
 
 def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals):
     nelson_rules_df = pd.DataFrame([{
-        'Name': '{}: Nelson Run Rule 1'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 1',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule1($minus3sd, $plus3sd)",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus3sd': limits_push_df[limits_push_df['Name'] == '{}: -3 Sigma'.format(signal_name)],
-            '$plus3sd': limits_push_df[limits_push_df['Name'] == '{}: +3 Sigma'.format(signal_name)]
+            '$minus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -3 Sigma'],
+            '$plus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +3 Sigma']
         }
     },{
-        'Name': '{}: Nelson Run Rule 2'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 2',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule2($mean, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == '{}: Mean'.format(signal_name)]
+            '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean']
         }
     },{
-        'Name': '{}: Nelson Run Rule 3'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 3',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule3("+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name]
         }
     },{
-        'Name': '{}: Nelson Run Rule 4'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 4',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule4("+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name]
         }
     },{
-        'Name': '{}: Nelson Run Rule 5'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 5',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule5($minus2sd, $plus2sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus2sd': limits_push_df[limits_push_df['Name'] == '{}: -2 Sigma'.format(signal_name)],
-            '$plus2sd': limits_push_df[limits_push_df['Name'] == '{}: +2 Sigma'.format(signal_name)]
+            '$minus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -2 Sigma'],
+            '$plus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +2 Sigma']
         }
     },{
-        'Name': '{}: Nelson Run Rule 6'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 6',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule6($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus1sd': limits_push_df[limits_push_df['Name'] == '{}: -1 Sigma'.format(signal_name)],
-            '$plus1sd': limits_push_df[limits_push_df['Name'] == '{}: +1 Sigma'.format(signal_name)]
+            '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
+            '$plus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +1 Sigma']
         }
     },{
-        'Name': '{}: Nelson Run Rule 7'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 7',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule7($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus1sd': limits_push_df[limits_push_df['Name'] == '{}: -1 Sigma'.format(signal_name)],
-            '$plus1sd': limits_push_df[limits_push_df['Name'] == '{}: +1 Sigma'.format(signal_name)]
+            '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
+            '$plus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +1 Sigma']
         }
     },{
-        'Name': '{}: Nelson Run Rule 8'.format(signal_name),
+        'Name': f'{signal_name}: Nelson Run Rule 8',
         'Type': 'Condition',
         'Formula': "$inputsignal.Nelson_RunRule8($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
-            '$minus1sd': limits_push_df[limits_push_df['Name'] == '{}: -1 Sigma'.format(signal_name)],
-            '$plus1sd': limits_push_df[limits_push_df['Name'] == '{}: +1 Sigma'.format(signal_name)]
+            '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
+            '$plus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: +1 Sigma']
         }
     }
     ])
@@ -429,7 +446,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
 
 def within_condition_signal_df(signal_name, input_condition, signals, conditions):
     within_signal_df = pd.DataFrame([{
-        'Name': '{}: Within Condition'.format(signal_name),
+        'Name': f'{signal_name}: Within Condition',
         'Type': 'Signal',
         'Formula': "$inputsignal.remove(not $inputcondition)",
         'Formula Parameters': {
@@ -449,7 +466,7 @@ def create_histogram(signal_df, start_time, end_time, input_condition, condition
         max_value = data[signal_name].max()+1*data[signal_name].std()
         min_value = data[signal_name].min()-1*data[signal_name].std()
         number_of_bins = 2*math.ceil((1+3.322*math.log10(data[signal_name].count())))
-        fxn_input_step1 = sdk.FunctionInputV1(name='{} Histogram'.format(signal_name), scoped_to=workbook_id, type="Chart" , 
+        fxn_input_step1 = sdk.FunctionInputV1(name=f'{signal_name} Histogram', scoped_to=workbook_id, type="Chart" , 
                         formula = 'conditionTable($condition1.toGroup($viewCapsule, CapsuleBoundary.Intersect), "'+capsule_property.v_model+'", $yValueSignal2.toStates(capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+')).toCondition("yValueCol2").toGroup($viewCapsule, CapsuleBoundary.Intersect), "yValueCol2").addStatColumn("signalToAggregate", $signalToAggregate, count())',                      
                         parameters= [
                             sdk.FormulaParameterInputV1(name='condition1', id=conditions[conditions['Name']==input_condition.v_model]['ID'].iloc[0]),
@@ -468,7 +485,7 @@ def create_histogram(signal_df, start_time, end_time, input_condition, condition
         max_value = data[signal_name].mean()+4*data[signal_name].std()
         min_value = data[signal_name].mean()-4*data[signal_name].std()
         number_of_bins = math.ceil((1+3.322*math.log10(data[signal_name].count())))
-        fxn_input_step1 = sdk.FunctionInputV1(name='{} Histogram'.format(signal_name), scoped_to=workbook_id, type="Chart" , 
+        fxn_input_step1 = sdk.FunctionInputV1(name=f'{signal_name} Histogram', scoped_to=workbook_id, type="Chart" , 
                         formula = 'conditionTable($yValueSignal1.toStates(capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+')).toCondition("yValueCol1").toGroup($viewCapsule, CapsuleBoundary.Intersect), "yValueCol1", capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+').property("value")).addStatColumn("signalToAggregate", $signalToAggregate, count())',                      
                         parameters= [
                             sdk.FormulaParameterInputV1(name='yValueSignal1', id=signal_df['ID'].iloc[0]),
