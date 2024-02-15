@@ -24,5 +24,11 @@ jobs:
       pages: write
       id-token: write
     steps:
-    - id: deployment
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Build & Deploy Sphinx
+      id: deployment
       uses: sphinx-notes/pages@v3
+      with:
+        checkout: false
