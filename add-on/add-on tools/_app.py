@@ -26,8 +26,8 @@ class SPCAccelerator:
             self.control_chart, self.we_runrules, self.nelson_runrules, self.histogram, 
             self.button, self.workbook_button, self.error, self.success
         ) = frontend(self.signal_list, self.condition_list, self.start_time, self.end_time)
-        self.button.on_event('click', self.input_validation())
-        self.input_condition.on_event('change', self.check_properties())
+        self.button.on_event('click', lambda widget, event, data: self.input_validation())
+        self.input_condition.on_event('change', lambda widget, event, data: self.check_properties())
 
     def check_properties(self):
         if isinstance(self.input_condition.v_model, str):
@@ -48,6 +48,7 @@ class SPCAccelerator:
             set_apply_to_condition(self.apply_to_condition, self.input_condition)
         else:
             disable_apply_to_condition(self.apply_to_condition, self.input_condition)
+
 
     def input_validation(self):
         self.success.value=False
