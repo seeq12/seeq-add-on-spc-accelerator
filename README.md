@@ -11,6 +11,8 @@ To add a new page to the documentation, add a new markdown file to the `docs/sou
 
 To add a new image to the documentation, add the image to the `docs/source/_static` directory and reference it in the markdown file.
 
+To add this functionality to a new project, copy the `docs` directory from this project to the new project and update the `conf.py` file to include the new project name. Also copy the .github/workflows/pages.yml file to the new project to enable the GitHub Pages deployment.
+
 ### Building Documentation Locally
 
 If you want to test changes to the documentation before merging a PR, you can build the documentation locally.
