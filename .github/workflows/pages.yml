@@ -34,3 +34,4 @@ jobs:
       uses: sphinx-notes/pages@v3
       with:
         checkout: false
+        documentation_path: ./docs/source
