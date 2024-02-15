@@ -15,12 +15,3 @@ SPC Accelerator Documentation
    Release Notes <release_notes.md>
    Getting Help <getting_help.md>
    License <license.md>
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
