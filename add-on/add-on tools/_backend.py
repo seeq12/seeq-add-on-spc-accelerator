@@ -157,25 +157,25 @@ def disable_apply_to_condition(apply_to_condition, input_condition):
     if not isinstance(input_condition.v_model, str):
         apply_to_condition.disabled = True
 
-def check_properties(apply_to_condition, input_condition, conditions, start_select, end_select, capsule_property):
-    if isinstance(input_condition.v_model, str):
-        apply_to_condition.disabled = False
-        capsules = spy.pull(
-            conditions[conditions['Name'] == input_condition.v_model], 
-            start=start_select.value, 
-            end=end_select.value, 
-            quiet=True
-            )
-        property_list = capsules.columns.to_list()
-        property_list = [s for s in property_list if s!='Condition']
-        property_list = [s for s in property_list if s!='Capsule Start']
-        property_list = [s for s in property_list if s!='Capsule End']
-        property_list = [s for s in property_list if s!='Capsule Is Uncertain']
-        capsule_property.v_model = property_list
-        capsule_property.items = property_list
-        set_apply_to_condition(apply_to_condition, input_condition)
-    else:
-        disable_apply_to_condition(apply_to_condition, input_condition)
+# def check_properties(apply_to_condition, input_condition, conditions, start_select, end_select, capsule_property):
+#     if isinstance(input_condition.v_model, str):
+#         apply_to_condition.disabled = False
+#         capsules = spy.pull(
+#             conditions[conditions['Name'] == input_condition.v_model], 
+#             start=start_select.value, 
+#             end=end_select.value, 
+#             quiet=True
+#             )
+#         property_list = capsules.columns.to_list()
+#         property_list = [s for s in property_list if s!='Condition']
+#         property_list = [s for s in property_list if s!='Capsule Start']
+#         property_list = [s for s in property_list if s!='Capsule End']
+#         property_list = [s for s in property_list if s!='Capsule Is Uncertain']
+#         capsule_property.v_model = property_list
+#         capsule_property.items = property_list
+#         set_apply_to_condition(apply_to_condition, input_condition)
+#     else:
+#         disable_apply_to_condition(apply_to_condition, input_condition)
         
 
 def check_input_signal(input_signal):

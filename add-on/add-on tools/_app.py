@@ -27,8 +27,29 @@ class SPCAccelerator:
             self.button, self.workbook_button, self.error, self.success
         ) = frontend(self.signal_list, self.condition_list, self.start_time, self.end_time)
         self.button.on_event('click', lambda widget, event, data: self.input_validation())
-        self.input_condition.on_event('change', lambda widget, event, data: check_properties(self.apply_to_condition, self.condition_list, self.conditions, self.start_select, self.end_select, self.capsule_property))
-        
+        self.input_condition.on_event('change', lambda widget, event, data: self.check_properties())
+
+    def check_properties(self):
+        if isinstance(self.input_condition.v_model, str):
+            self.apply_to_condition.disabled = False
+            capsules = spy.pull(
+                self.conditions[self.conditions['Name'] == self.input_condition.v_model], 
+                start=self.start_select.value, 
+                end=self.end_select.value, 
+                quiet=True
+                )
+            property_list = capsules.columns.to_list()
+            property_list = [s for s in property_list if s!='Condition']
+            property_list = [s for s in property_list if s!='Capsule Start']
+            property_list = [s for s in property_list if s!='Capsule End']
+            property_list = [s for s in property_list if s!='Capsule Is Uncertain']
+            self.capsule_property.v_model = property_list
+            self.capsule_property.items = property_list
+            set_apply_to_condition(self.apply_to_condition, self.input_condition)
+        else:
+            disable_apply_to_condition(self.apply_to_condition, self.input_condition)
+
+
     def input_validation(self):
         self.success.value=False
         self.input_signal = check_input_signal(self.input_signal)
