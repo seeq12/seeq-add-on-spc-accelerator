@@ -9,6 +9,8 @@ To update the documentation, make changes to the markdown files in the `docs/sou
 
 To add a new page to the documentation, add a new markdown file to the `docs/source` directory and include it in the `index.rst` file.
 
+To add a new image to the documentation, add the image to the `docs/source/_static` directory and reference it in the markdown file.
+
 ### Building Documentation Locally
 
 If you want to test changes to the documentation before merging a PR, you can build the documentation locally.
