@@ -26,9 +26,17 @@ class SPCAccelerator:
             self.control_chart, self.we_runrules, self.nelson_runrules, self.histogram, 
             self.button, self.workbook_button, self.error, self.success
         ) = frontend(self.signal_list, self.condition_list, self.start_time, self.end_time)
-        self.button.on_event('click', lambda widget, event, data: self.input_validation())
+        self.button.on_event('click', self.input_validation)
         self.input_condition.on_event('change', lambda widget, event, data: self.check_properties())
 
+    def input_validation(self):
+        self.success.value=False
+        self.input_signal = check_input_signal(self.input_signal)
+        self.error = check_training_window(self.end_select, self.start_select, self.error)
+        
+        if (self.input_signal.error == False) and (self.error.value == False):
+            self.workbook_button, self.success, self.button = create_control_chart(self)
+            
     def check_properties(self):
         if isinstance(self.input_condition.v_model, str):
             self.apply_to_condition.disabled = False
@@ -49,15 +57,6 @@ class SPCAccelerator:
         else:
             disable_apply_to_condition(self.apply_to_condition, self.input_condition)
 
-
-    def input_validation(self):
-        self.success.value=False
-        self.input_signal = check_input_signal(self.input_signal)
-        self.error = check_training_window(self.end_select, self.start_select, self.error)
-        
-        if (self.input_signal.error == False) and (self.error.value == False):
-            self.workbook_button, self.success, self.button = create_control_chart(self)
-        
     def display_error_widget(self, error_message):
         error_widget = ipw.HBox([
             ipw.HTML(value=f'''<font size='+0'><font color='red'><b>Error: {error_message}</b></font color></font size>''')
