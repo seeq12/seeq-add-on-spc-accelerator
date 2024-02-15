@@ -27,7 +27,7 @@ class SPCAccelerator:
             self.button, self.workbook_button, self.error, self.success
         ) = frontend(self.signal_list, self.condition_list, self.start_time, self.end_time)
         self.button.on_event('click', lambda widget, event, data: self.input_validation())
-        self.input_condition.on_event('change', lambda widget, event, data: check_properties(self.apply_to_condition, self.condition_list, self.conditions, self.start_select, self.end_select, self.capsule_properties ))
+        self.input_condition.on_event('change', lambda widget, event, data: check_properties(self.apply_to_condition, self.condition_list, self.conditions, self.start_select, self.end_select, self.capsule_property))
         
     def input_validation(self):
         self.success.value=False
