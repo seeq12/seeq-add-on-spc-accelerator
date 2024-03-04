@@ -6,27 +6,29 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'SPC Accelerator'
-copyright = '2024, Seeq Corporation'
-author = 'Chris Harp'
+project = "SPC Accelerator"
+copyright = "2024, Seeq Corporation"
+author = "Chris Harp"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = [
-    'myst_parser'
-]
+extensions = ["myst_parser"]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
 
-html_favicon = '_static/seeq-favicon.ico'
-html_logo = '_static/Seeq_logo_darkBlue_sm.png'
+html_favicon = "_static/seeq-favicon.ico"
+html_logo = "_static/Seeq_logo_white.svg"
+
+# CSS
+html_css_files = [
+    "css/style.css",
+]

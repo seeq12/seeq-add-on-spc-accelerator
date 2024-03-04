@@ -6,4 +6,35 @@
  */
 
 /* This line is theme specific - it includes the base theme CSS */
-@import '../nature.css';  /* for Alabaster */
+@import '../nature.css';
+/* for Alabaster */
+
+.wy-side-nav-search {
+    background-color: #081F2C;
+}
+
+.wy-nav-side {
+    background: #081F2C;
+}
+
+.wy-side-nav-search img.logo {
+    width: 50% !important;
+}
+
+.wy-menu.wy-menu-vertical span {
+    color: #00FA87
+}
+
+.wy-nav-content-wrap {
+    background: #fcfcfc;
+}
+
+.wy-menu-vertical a:active {
+    background-color: #00FA87 !important;
+    color: #081F2C !important;
+}
+
+.wy-menu-vertical a:hover {
+    background-color: #00FA87 !important;
+    color: #081F2C !important;
+}

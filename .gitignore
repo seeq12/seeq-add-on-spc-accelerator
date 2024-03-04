@@ -143,4 +143,5 @@ bin/
 venv/
 ```
 
+# built documentation
 /docs/build/
