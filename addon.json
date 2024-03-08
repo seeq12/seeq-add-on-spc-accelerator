@@ -1,27 +1,26 @@
 {
-    "identifier": "com.seeq.addon.spc-accelerator",
-    "name": "SPC Accelerator",
-    "description": "DESCRIPTION HERE",
-    "version": "0.1.0",
-    "license": "Apache 2.0",
-    "icon": "fa fa-wrench",
-    "maintainer": "Seeq Corporation",
-    "previews": [
-      "docs/source/_static/preview.png"
-    ],
-    "elements": [
-      {
-        "name": "SPC Accelerator",
-        "identifier": "com.seeq.addon.spc-accelerator.ui",
-        "type": "AddOnTool",
-        "path": "add-on/add-on tools"
-      },
-      {
-        "name": "Run Rules",
-        "identifier": "com.seeq.addon.spc-accelerator.udf",
-        "type": "FormulaPackage",
-        "path": "add-on/udf"
-      }
-    ]
-  }
-  
+  "identifier": "com.seeq.addon.spc-accelerator",
+  "name": "SPC Accelerator",
+  "description": "DESCRIPTION HERE",
+  "version": "0.1.0",
+  "license": "Apache 2.0",
+  "icon": "fa fa-wrench",
+  "maintainer": "Seeq Corporation",
+  "previews": [
+    "docs/source/_static/preview.png"
+  ],
+  "elements": [
+    {
+      "name": "SPC Accelerator",
+      "identifier": "com.seeq.addon.spc-accelerator.ui",
+      "type": "AddOnTool",
+      "path": "add-on-tool"
+    },
+    {
+      "name": "Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.udf",
+      "type": "FormulaPackage",
+      "path": "udf"
+    }
+  ]
+}
