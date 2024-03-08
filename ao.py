@@ -20,6 +20,7 @@ ELEMENT_ACTION_FILE = "element"
 IDENTIFIER = "identifier"
 VERSION = "version"
 ELEMENTS = "elements"
+PREVIEWS = "previews"
 ELEMENT_PATH = "path"
 ELEMENT_IDENTIFIER = "identifier"
 
@@ -30,7 +31,9 @@ ADD_ON_METADATA_EXTENSION = ".addonmeta"
 
 
 def get_files_to_package() -> List[str]:
-    return ["addon.json"]
+    add_on_json = get_add_on_json()
+    preview_files = add_on_json.get(PREVIEWS, [])
+    return ["addon.json"] + preview_files
 
 
 def create_package_filename(dist_base_filename: str, version: str) -> str:

@@ -17,10 +17,16 @@
       "path": "add-on-tool"
     },
     {
-      "name": "Run Rules",
-      "identifier": "com.seeq.addon.spc-accelerator.udf",
+      "name": "Nelson Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.nelson-run-rules",
       "type": "FormulaPackage",
-      "path": "udf"
+      "path": "nelson-run-rules"
+    },
+    {
+      "name": "Western Electric Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.western-electric-run-rules",
+      "type": "FormulaPackage",
+      "path": "western-electric-run-rules"
     }
   ]
 }
