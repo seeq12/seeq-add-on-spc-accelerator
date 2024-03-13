@@ -9,7 +9,7 @@
             "id": "f253c5ca-6eed-43e0-993e-5696ecd441ea",
             "name": "RunRule1",
             "description": "<p>Nelson Run Rule One. This function creates a condition when any single data point falls outside the control limits from the centerline (i.e., any point that falls outside Zone A, beyond either the upper or lower control limit).</p>",
-            "formula": " /convert to a step signal /n $signalStep = $signal.toStep() /n //find when one data point goes outside the plus3sigma or minus 3sigma limits /n ($signalStep < $minus3sd or $signalStep > $plus3sd)",
+            "formula": "$signalStep = $signal.toStep() \n ($signalStep < $minus3sd or $signalStep > $plus3sd)",
             "type": "UserDefinedFormulaFunction",
             "parameters": [
                 {

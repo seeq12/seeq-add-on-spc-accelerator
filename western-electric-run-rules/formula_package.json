@@ -1,6 +1,6 @@
 {
 	"formulaPackage": {
-		"name": "WesternElectric",
+		"name": "WesternElectricRunRules",
 		"creatorName": "Christopher Harp",
 		"creatorContactInfo": "christopher.harp@seeq.com"
 	},
@@ -134,7 +134,7 @@
 					{
 						"description": "Find when a signal has 9 consecutive points on the same side of the mean.",
 						"formula": "$signal.WesternElectric_RunRule4($mean, $maxinterp)"
-					}					
+					}
 				]
 			}
 		}

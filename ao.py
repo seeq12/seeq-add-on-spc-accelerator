@@ -19,7 +19,6 @@ from build import (
     ElementProtocol,
     generate_schema_default_dict,
     AddOnManagerSession,
-    get_authenticated_session,
 )
 
 PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
@@ -92,14 +91,32 @@ def get_add_on_manager_api_url(project_id: str) -> str:
     return f"{base_url}/data-lab/{project_id}/functions/notebooks/addonmanagerAPI/endpoints/add-ons"
 
 
-def get_conf_dict():
+def get_configuration():
+    """
+    Fetch the configuration of the add-on, used when deploying the add-on to add-on-manager.
+    If a configuration.json file is present in an element, it will use that instead of the default configuration.
+    """
     addon_json = get_add_on_json()
     config = {}
     for element in addon_json[ELEMENTS]:
-        if "configuration_schema" in element:
+        # check if there's a configuration.json file in each element. If yes, use that instead of default
+        configuration_file_path = (
+            pathlib.Path(element[ELEMENT_PATH]) / "configuration.json"
+        )
+        if configuration_file_path.exists():
+            print(f"Using configuration.json for element {element[ELEMENT_IDENTIFIER]}")
+            with open(configuration_file_path, "r") as f:
+                config[element[ELEMENT_IDENTIFIER]] = json.load(f)
+        elif "configuration_schema" in element:
+            print(
+                f"Using default configuration for element {element[ELEMENT_IDENTIFIER]}"
+            )
             default_config = generate_schema_default_dict(element[CONFIGURATION_SCHEMA])
             config[element[ELEMENT_IDENTIFIER]] = default_config
         else:
+            print(
+                f"No configuration schema found for element {element[ELEMENT_IDENTIFIER]}"
+            )
             pass
     return config
 
@@ -187,35 +204,32 @@ def build(args=None):
 
 def deploy(args):
     "Package and deploy the add-on to the server; assumes AoM is installed"
-    add_on_json = get_add_on_json()
     url, username, password = _parse_url_username_password(args)
     add_on_identifier = get_add_on_identifier()
-
-    requests_session, auth_header, project_id = get_authenticated_session(
-        url, ADD_ON_MANAGER_PROJECT_NAME, username, password
-    )
     session = AddOnManagerSession(url, username, password)
 
     package(args)
     # if clean, uninstall the add-on via AoM
-    # TODO: Check if add-on exists before uninstalling
+    # TODO: allow force uninstall flag
     if args.clean:
         print("Checking if Add-on is installed")
-        response = session.get_add_on(add_on_identifier)
-        if response.json().get("add_on_status") == "CanUninstall":
+        add_on_response = session.get_add_on(add_on_identifier)
+        if add_on_response.json().get("add_on_status") == "CanUninstall":
             print("Uninstalling add-on")
-            response = session.uninstall_add_on(add_on_identifier, force=False)
-            if not response.ok:
+            uninstall_response = session.uninstall_add_on(
+                add_on_identifier, force=False
+            )
+            if not uninstall_response.ok:
                 if (
-                    response.json()["error"]["message"]
+                    uninstall_response.json()["error"]["message"]
                     == f"No installed Add-on found with identifier {get_add_on_identifier()}"
                 ):
                     raise Exception(
                         "Add-on not installed or is unable to be uninstalled"
                     )
                 else:
-                    response.text
-                    response.raise_for_status()
+                    uninstall_response.text
+                    uninstall_response.raise_for_status()
         else:
             print(
                 "Add-on either not present or is not in a state to be uninstalled. Skipping uninstall"
@@ -228,22 +242,23 @@ def deploy(args):
         DIST_FOLDER / f"{filename}",
         "rb",
     ) as f:
-        # base64 encode the file first
+        # file must be base64 encoded
         encoded_file = base64.b64encode(f.read())
-        response = session.upload_add_on(filename, encoded_file)
-        response.raise_for_status()
+        upload_response = session.upload_add_on(filename, encoded_file)
+    upload_response.raise_for_status()
     print("Add-on uploaded")
-    response_body = response.json()
-    print(f"Add-on status is: {response_body['add_on_status']}")
+    upload_response_body = upload_response.json()
+    print(f"Add-on status is: {upload_response_body['add_on_status']}")
 
     print("Fetching configuration")
-    configuration = get_conf_dict()
-    # TODO: Let you provide a override configuration
+    configuration = get_configuration()
     print("Installing Add-on")
-    response = session.install_add_on(
-        add_on_identifier, response_body["binary_filename"], configuration
+    install_response = session.install_add_on(
+        add_on_identifier, upload_response_body["binary_filename"], configuration
     )
-    print(response.text)
+    print(install_response.text)
+    install_response.raise_for_status()
+    print("Deployment to Add On Manager Complete")
 
 
 def deploy_old(args):
