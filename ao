@@ -1,0 +1,9 @@
+#! /bin/bash
+
+# This is the root command for the Seeq Addon build system
+# change to reference the venv python
+
+# exit on error
+set -e
+
+python3 ./ao.py "$@"
