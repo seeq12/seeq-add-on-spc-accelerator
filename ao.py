@@ -10,6 +10,7 @@ import base64
 import json
 from typing import Optional, List
 import jsonschema
+import venv
 
 
 from build import (
@@ -18,13 +19,19 @@ from build import (
     topological_sort,
     ElementProtocol,
     generate_schema_default_dict,
-    AddOnManagerSession,
 )
 
 PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
 WHEELS_PATH = PROJECT_PATH / ".wheels"
 ADDON_JSON_FILE = PROJECT_PATH / "addon.json"
 BOOTSTRAP_JSON_FILE = PROJECT_PATH / ".bootstrap.json"
+
+WINDOWS_OS = os.name == "nt"
+BUILD_PATH = PROJECT_PATH / "build"
+VIRTUAL_ENVIRONMENT_PATH = BUILD_PATH / ".venv"
+PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin")
+PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
+PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
 
 ELEMENT_ACTION_FILE = "element"
 
@@ -177,6 +184,8 @@ def bootstrap(args):
         BOOTSTRAP_JSON_FILE,
         {"username": args.username, "password": args.password, "url": args.url},
     )
+    # create the virtual build environment
+    _create_virtual_environment(args.clean)
     target_elements = filter_element_paths(
         get_element_paths(), get_folders_from_args(args)
     )
@@ -186,6 +195,30 @@ def bootstrap(args):
         get_module(element_path).bootstrap(
             args.username, args.password, args.url, args.clean
         )
+
+
+def _create_virtual_environment(clean: bool = False):
+    if (
+        not clean
+        and VIRTUAL_ENVIRONMENT_PATH.exists()
+        and VIRTUAL_ENVIRONMENT_PATH.is_dir()
+    ):
+        print("Virtual environment already exists.")
+        return
+    print("Creating virtual environment...")
+    venv.EnvBuilder(
+        system_site_packages=False, with_pip=True, clear=True, symlinks=not WINDOWS_OS
+    ).create(VIRTUAL_ENVIRONMENT_PATH)
+    subprocess.run(
+        f"{PATH_TO_PYTHON} -m pip install --upgrade pip", shell=True, check=True
+    )
+    subprocess.run(
+        f"{PATH_TO_PIP} install -r {BUILD_PATH / 'requirements.dev.txt'}"
+        f" -f {WHEELS_PATH}",
+        shell=True,
+        check=True,
+    )
+    print("Virtual environment created.")
 
 
 def build(args=None):
@@ -204,6 +237,8 @@ def build(args=None):
 
 def deploy(args):
     "Package and deploy the add-on to the server; assumes AoM is installed"
+    from build.add_on import AddOnManagerSession
+
     url, username, password = _parse_url_username_password(args)
     add_on_identifier = get_add_on_identifier()
     session = AddOnManagerSession(url, username, password)

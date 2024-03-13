@@ -1,9 +1,30 @@
 #! /bin/bash
 
 # This is the root command for the Seeq Addon build system
-# change to reference the venv python
 
 # exit on error
 set -e
 
-python3 ao.py "$@"
+venv_path="build/.venv"
+
+if [ -d "$venv_path" ]; then
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        "$venv_path/Scripts/python.exe" ao.py "$@"
+    else
+        "$venv_path/bin/python" ao.py "$@"
+    fi
+else
+    if [ "$1" = "bootstrap" ]; then
+        if command -v python &> /dev/null; then
+            python ao.py "$@"
+        elif command -v python3 &> /dev/null; then
+            python3 ao.py "$@"
+        else
+            echo "Error: Python not found. Please install Python."
+            exit 1
+        fi
+    else
+        echo "Error: Virtual environment not found. Please call ao bootstrap."
+        exit 1
+    fi
+fi

@@ -16,5 +16,5 @@ from build.utils import (
     file_matches_criteria,
     generate_schema_default_dict,
 )
-from build.add_on import DataLabFunctionSession, AddOnManagerSession
+
 from build.session import get_authenticated_session
