@@ -10,6 +10,10 @@ import venv
 from datetime import datetime
 from os.path import isdir, relpath
 from typing import List
+
+# TODO Remove this hack
+here = os.path.dirname(__file__)
+sys.path.append(os.path.join(here, ".."))
 from ao import get_element_identifier_from_path
 
 CURRENT_FILE = pathlib.Path(__file__)
@@ -76,9 +80,7 @@ def watch(url: str, username: str, password: str) -> subprocess.Popen:
 
 
 def test() -> None:
-    subprocess.run(
-        f"{PATH_TO_PYTEST} -m unit", cwd=ELEMENT_PATH, check=True, shell=True
-    )
+    subprocess.run(f"{PATH_TO_PYTEST}", cwd=ELEMENT_PATH, check=True, shell=True)
 
 
 async def _watch_from_environment(url: str, username: str, password: str):

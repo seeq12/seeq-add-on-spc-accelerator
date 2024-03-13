@@ -6,9 +6,21 @@ import pathlib
 import subprocess
 import sys
 import zipfile
+import base64
+import json
 from typing import Optional, List
+import jsonschema
 
-from build import load_json, save_json, topological_sort, ElementProtocol
+
+from build import (
+    load_json,
+    save_json,
+    topological_sort,
+    ElementProtocol,
+    generate_schema_default_dict,
+    AddOnManagerSession,
+    get_authenticated_session,
+)
 
 PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
 WHEELS_PATH = PROJECT_PATH / ".wheels"
@@ -23,11 +35,13 @@ ELEMENTS = "elements"
 PREVIEWS = "previews"
 ELEMENT_PATH = "path"
 ELEMENT_IDENTIFIER = "identifier"
+CONFIGURATION_SCHEMA = "configuration_schema"
 
 DIST_FOLDER = PROJECT_PATH / "dist"
-DIST_BASE_FILENAME = "add_on_manager"
 ADD_ON_EXTENSION = ".addon"
 ADD_ON_METADATA_EXTENSION = ".addonmeta"
+
+ADD_ON_MANAGER_PROJECT_NAME = "com.seeq.add-on-manager"
 
 
 def get_files_to_package() -> List[str]:
@@ -41,7 +55,10 @@ def create_package_filename(dist_base_filename: str, version: str) -> str:
 
 
 def get_add_on_json() -> Optional[dict]:
-    return load_json(ADDON_JSON_FILE)
+    add_on_json = load_json(ADDON_JSON_FILE)
+    if add_on_json is None:
+        raise Exception(f"{ADDON_JSON_FILE} file not found.")
+    return add_on_json
 
 
 def get_bootstrap_json() -> Optional[dict]:
@@ -61,9 +78,30 @@ def get_element_paths() -> List[str]:
 
 def get_add_on_identifier() -> str:
     add_on_json = get_add_on_json()
-    if add_on_json is None:
-        raise Exception(f"{ADDON_JSON_FILE} file not found.")
     return add_on_json[IDENTIFIER]
+
+
+def get_add_on_package_name() -> str:
+    add_on_json = get_add_on_json()
+    return f"{create_package_filename(add_on_json[IDENTIFIER], add_on_json[VERSION])}"
+
+
+def get_add_on_manager_api_url(project_id: str) -> str:
+    bootstrap_json = get_bootstrap_json()
+    base_url = bootstrap_json["url"]
+    return f"{base_url}/data-lab/{project_id}/functions/notebooks/addonmanagerAPI/endpoints/add-ons"
+
+
+def get_conf_dict():
+    addon_json = get_add_on_json()
+    config = {}
+    for element in addon_json[ELEMENTS]:
+        if "configuration_schema" in element:
+            default_config = generate_schema_default_dict(element[CONFIGURATION_SCHEMA])
+            config[element[ELEMENT_IDENTIFIER]] = default_config
+        else:
+            pass
+    return config
 
 
 def get_element_identifier_from_path(element_path: pathlib.Path) -> str:
@@ -148,6 +186,67 @@ def build(args=None):
 
 
 def deploy(args):
+    "Package and deploy the add-on to the server; assumes AoM is installed"
+    add_on_json = get_add_on_json()
+    url, username, password = _parse_url_username_password(args)
+    add_on_identifier = get_add_on_identifier()
+
+    requests_session, auth_header, project_id = get_authenticated_session(
+        url, ADD_ON_MANAGER_PROJECT_NAME, username, password
+    )
+    session = AddOnManagerSession(url, username, password)
+
+    package(args)
+    # if clean, uninstall the add-on via AoM
+    # TODO: Check if add-on exists before uninstalling
+    if args.clean:
+        print("Checking if Add-on is installed")
+        response = session.get_add_on(add_on_identifier)
+        if response.json().get("add_on_status") == "CanUninstall":
+            print("Uninstalling add-on")
+            response = session.uninstall_add_on(add_on_identifier, force=False)
+            if not response.ok:
+                if (
+                    response.json()["error"]["message"]
+                    == f"No installed Add-on found with identifier {get_add_on_identifier()}"
+                ):
+                    raise Exception(
+                        "Add-on not installed or is unable to be uninstalled"
+                    )
+                else:
+                    response.text
+                    response.raise_for_status()
+        else:
+            print(
+                "Add-on either not present or is not in a state to be uninstalled. Skipping uninstall"
+            )
+
+    # upload the add-on
+    print("Uploading add-on")
+    filename = f"{get_add_on_package_name()}{ADD_ON_EXTENSION}"
+    with open(
+        DIST_FOLDER / f"{filename}",
+        "rb",
+    ) as f:
+        # base64 encode the file first
+        encoded_file = base64.b64encode(f.read())
+        response = session.upload_add_on(filename, encoded_file)
+        response.raise_for_status()
+    print("Add-on uploaded")
+    response_body = response.json()
+    print(f"Add-on status is: {response_body['add_on_status']}")
+
+    print("Fetching configuration")
+    configuration = get_conf_dict()
+    # TODO: Let you provide a override configuration
+    print("Installing Add-on")
+    response = session.install_add_on(
+        add_on_identifier, response_body["binary_filename"], configuration
+    )
+    print(response.text)
+
+
+def deploy_old(args):
     url, username, password = _parse_url_username_password(args)
     if args.dir is None:
         path_to_python = get_module("data-lab-functions").PATH_TO_PYTHON
@@ -173,10 +272,7 @@ def package(args=None):
     print("Packaging")
     if not args.skip_build:
         build()
-    add_on_json = get_add_on_json()
-    if add_on_json is None:
-        raise Exception(f"{ADDON_JSON_FILE} file not found.")
-    file_name = create_package_filename(get_add_on_identifier(), add_on_json[VERSION])
+    file_name = get_add_on_package_name()
 
     if DIST_FOLDER.exists():
         for file in glob.glob(f"{DIST_FOLDER}/*"):
@@ -295,11 +391,7 @@ if __name__ == "__main__":
         "--replace", action="store_true", default=False, help="Replace elements"
     )
     parser_deploy.add_argument(
-        "--dir",
-        type=str,
-        nargs="*",
-        default=None,
-        help="Execute the command for the subset of the element directories specified.",
+        "--skip-build", action="store_true", default=False, help="Skip build step"
     )
     parser_deploy.set_defaults(func=deploy)
 

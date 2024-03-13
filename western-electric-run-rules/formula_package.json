@@ -105,27 +105,29 @@
 					"formula": "1d"
 				}
 			]
-		}		
+		}
 	],
-    "docs": [
-        {
-            "name": "index",
-            "description": "Allows creation of the four Western Electric Run Rules. Created based on Western Electric Run Rules.",
-            "title": "Western Electric Run Rules",
-            "examples": [
-                {
-                    "description": "Find when a sample point in a signal is above or below the control limits of +/-3 standard deviations from the mean.",
-                    "formula": "$signal.WesternElectric_RunRule1($minus3sd, $plus3sd)"
-                },
-                {
-                    "description": "Find when a signal has 2 out 3 points above or below the +/-2 standard deviation limits.",
-                    "formula": "$signal.WesternElectric_RunRule2($minus2sd, $plus2sd, $maxinterp)"
-                },
-                {
-                    "description": "Find when a signal has 4 out of 5 points above or below the +/-1 standard deviation limits.",
-                    "formula": "$signal.WesternElectric_RunRule3($minus1sd, $plus1sd, $maxinterp)"
-                }
-            ]
-        }
-    ]
+	"docs": [
+		{
+			"name": "index",
+			"description": "Allows creation of the four Western Electric Run Rules. Created based on Western Electric Run Rules.",
+			"title": "Western Electric Run Rules",
+			"examples": {
+				"examples": [
+					{
+						"description": "Find when a sample point in a signal is above or below the control limits of +/-3 standard deviations from the mean.",
+						"formula": "$signal.WesternElectric_RunRule1($minus3sd, $plus3sd)"
+					},
+					{
+						"description": "Find when a signal has 2 out 3 points above or below the +/-2 standard deviation limits.",
+						"formula": "$signal.WesternElectric_RunRule2($minus2sd, $plus2sd, $maxinterp)"
+					},
+					{
+						"description": "Find when a signal has 4 out of 5 points above or below the +/-1 standard deviation limits.",
+						"formula": "$signal.WesternElectric_RunRule3($minus1sd, $plus1sd, $maxinterp)"
+					}
+				]
+			}
+		}
+	]
 }
