@@ -20,11 +20,11 @@ else
         elif command -v python3 &> /dev/null; then
             python3 ao.py "$@"
         else
-            echo "Error: Python not found. Please install Python."
+            echo "Error: Python not found. Please ensure python or python3 is on your Path."
             exit 1
         fi
     else
-        echo "Error: Virtual environment not found. Please call ao bootstrap."
+        echo "Error: Virtual environment not found. Please call ao bootstrap --url <URL> --username <USERNAME> --password <PASSWORD>."
         exit 1
     fi
 fi
