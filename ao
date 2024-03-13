@@ -6,4 +6,4 @@
 # exit on error
 set -e
 
-python3 ./ao.py "$@"
+python3 ao.py "$@"
