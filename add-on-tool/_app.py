@@ -45,13 +45,14 @@ class SPCAccelerator:
         ) = frontend(
             self.signal_list, self.condition_list, self.start_time, self.end_time
         )
-        self.button.on_event("click", self.input_validation)
+        self.button.on_event(
+            "click", lambda widget, event, data: self.input_validation()
+        )
         self.input_condition.on_event(
             "change", lambda widget, event, data: self.check_properties()
         )
 
     def input_validation(self):
-
         self.success.value = False
         self.input_signal = check_input_signal(self.input_signal)
         self.error = check_training_window(
