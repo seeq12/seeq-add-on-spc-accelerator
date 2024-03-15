@@ -13,17 +13,14 @@ class SPCAccelerator:
         self.worksheet_id = worksheet_id
         self.app = v.App(id="SPC Accelerator")
         self.output_results = ipw.Output
-        try:
-            (
-                self.signal_list,
-                self.condition_list,
-                self.start_time,
-                self.end_time,
-                self.signals,
-                self.conditions,
-            ) = pull_worksheet_data(self.URL, self.workbook_id, self.worksheet_id)
-        except Exception as e:
-            self.display_error_widget(str(e))
+        (
+            self.signal_list,
+            self.condition_list,
+            self.start_time,
+            self.end_time,
+            self.signals,
+            self.conditions,
+        ) = pull_worksheet_data(self.URL, self.workbook_id, self.worksheet_id)
 
         (
             self.input_signal,
