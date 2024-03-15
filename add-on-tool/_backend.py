@@ -315,7 +315,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     western_electric_rules_df = pd.DataFrame([{
         'Name': f'{signal_name}: Western Electric Run Rule 1',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule1($minus3sd, $plus3sd)",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule1($minus3sd, $plus3sd)",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -3 Sigma'],
@@ -324,7 +324,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     },{
         'Name': f'{signal_name}: Western Electric Run Rule 2',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule2($minus2sd, $plus2sd, "+interp_value+")",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule2($minus2sd, $plus2sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -2 Sigma'],
@@ -333,7 +333,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     },{
         'Name': f'{signal_name}: Western Electric Run Rule 3',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule3($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule3($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -342,7 +342,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     },{
         'Name': f'{signal_name}: Western Electric Run Rule 4',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule4($mean, "+interp_value+")",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule4($mean, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean']
@@ -355,7 +355,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     nelson_rules_df = pd.DataFrame([{
         'Name': f'{signal_name}: Nelson Run Rule 1',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule1($minus3sd, $plus3sd)",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule1($minus3sd, $plus3sd)",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -3 Sigma'],
@@ -364,7 +364,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 2',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule2($mean, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule2($mean, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean']
@@ -372,21 +372,21 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 3',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule3("+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule3("+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name]
         }
     },{
         'Name': f'{signal_name}: Nelson Run Rule 4',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule4("+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule4("+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name]
         }
     },{
         'Name': f'{signal_name}: Nelson Run Rule 5',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule5($minus2sd, $plus2sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule5($minus2sd, $plus2sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -2 Sigma'],
@@ -395,7 +395,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 6',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule6($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule6($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -404,7 +404,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 7',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule7($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule7($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -413,7 +413,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 8',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule8($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule8($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
