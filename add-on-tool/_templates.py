@@ -21,11 +21,11 @@ def create_template(URL, display_dict, histogram, input_condition, start_select,
         display_df.loc[3:4, 'Color'] = '#ffc000'
         display_df.loc[5:6, 'Color'] = '#ff0000'
         if isinstance(input_condition.v_model, str):
-            display_df.loc[7:8, 'Color'] = '#002060'
+            display_df.loc[7:8, 'Color'] = '#4055a3'
             if len(display_df)>9:
                 display_df.loc[9:, 'Color'] = '#ff0000'
         else:
-            display_df.at[7, 'Color'] = '#002060'
+            display_df.at[7, 'Color'] = '#4055a3'
             if len(display_df)>8:
                 display_df.loc[8:, 'Color'] = '#ff0000'
         worksheet = [w for w in ws if w.name == worksheet_name][0]
@@ -71,11 +71,10 @@ def format_histogram_worksheet(histogram_id, signal_name, URL, workbook_id):
     wb = spy.workbooks.pull(URL, quiet=True)
     
     try:
-        wb_name = wb[0]['Name']
-        ws= wb[0].worksheets[f'My Folder >> {wb_name} >> {signal_name} Histogram']
+        ws = wb[0].worksheets[f"My Folder >> {wb[0]['Name']} >> {signal_name} Histogram"]
     except:
         for sheet in wb[0].worksheets:
-            if sheet['Name'] == f'{signal_name} Histogram':
+            if sheet['Name'] == f"{signal_name} Histogram":
                 ws = sheet
           
     ws.display_items = pd.DataFrame(columns=['Name', 'Type', 'ID'])
