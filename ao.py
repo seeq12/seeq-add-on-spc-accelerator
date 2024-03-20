@@ -291,7 +291,6 @@ def deploy(args):
     install_response = session.install_add_on(
         add_on_identifier, upload_response_body["binary_filename"], configuration
     )
-    print(install_response.text)
     install_response.raise_for_status()
     print("Deployment to Add On Manager Complete")
 
