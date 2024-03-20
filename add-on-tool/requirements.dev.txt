@@ -1,0 +1,9 @@
+seeq
+seeq-spy
+wheel
+pytest==7.4.2
+mock==5.1.0
+pycodestyle==2.10.0
+autopep8==2.0.4
+watchfiles==0.20.0
+ipyvuetify==1.8.2

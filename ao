@@ -1,0 +1,54 @@
+#! /bin/bash
+
+# This is the root command for the Seeq Addon build system
+
+# Exit on error
+set -e
+
+venv_path="build/.venv"
+
+if [ -d "$venv_path" ]; then
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        "$venv_path/Scripts/python.exe" ao.py "$@"
+    else
+        "$venv_path/bin/python" ao.py "$@"
+    fi
+else
+    if [ "$1" = "bootstrap" ]; then
+        # Initialize variables
+        custom_python=""
+        args=()
+
+        # Process arguments
+        while [[ $# -gt 0 ]]; do
+            key="$1"
+
+            case $key in
+                --python)
+                    custom_python="$2"
+                    shift # past argument
+                    shift # past value
+                    ;;
+                *)
+                    args+=("$1") # save it in an array for later
+                    shift # past argument
+                    ;;
+            esac
+        done
+
+        # Use custom or system Python to run ao.py with the remaining arguments, including 'bootstrap'
+        if [[ -n "$custom_python" ]]; then
+            "$custom_python" ao.py "${args[@]}"
+        else
+            if command -v python &> /dev/null; then
+                python ao.py "${args[@]}"
+            else
+                echo "Error: Python not found. Please ensure Python is on your path or specify what Python to use with the --python flag."
+                exit 1
+            fi
+        fi
+    else
+        echo "Error: Virtual environment not found. Please call 'ao bootstrap --url <URL> --username <USERNAME> --password <PASSWORD> [--python <PYTHON_PATH>].'"
+        exit 1
+    fi
+fi

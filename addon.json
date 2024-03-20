@@ -1,27 +1,91 @@
 {
-    "identifier": "com.seeq.addon.spc-accelerator",
-    "name": "SPC Accelerator",
-    "description": "DESCRIPTION HERE",
-    "version": "0.1.0",
-    "license": "Apache 2.0",
-    "icon": "fa fa-wrench",
-    "maintainer": "Seeq Corporation",
-    "previews": [
-      "docs/source/_static/preview.png"
-    ],
-    "elements": [
-      {
-        "name": "SPC Accelerator",
-        "identifier": "com.seeq.addon.spc-accelerator.ui",
-        "type": "AddOnTool",
-        "path": "add-on/add-on tools"
+  "identifier": "com.seeq.addon.spc-accelerator",
+  "name": "SPC Accelerator",
+  "description": "DESCRIPTION HERE",
+  "version": "0.1.0",
+  "license": "Apache 2.0",
+  "icon": "fa fa-wrench",
+  "maintainer": "Seeq Corporation",
+  "previews": [
+    "docs/source/_static/preview.png"
+  ],
+  "elements": [
+    {
+      "name": "SPC Accelerator",
+      "description": "SPC Time!",
+      "identifier": "com.seeq.addon.spc-accelerator.ui",
+      "type": "AddOnTool",
+      "path": "add-on-tool",
+      "notebook_file_path": "SPC Accelerator.ipynb",
+      "resource_size": "GP_S",
+      "extensions": [],
+      "configuration_schema": {
+        "type": "object",
+        "properties": {
+          "display": {
+            "type": "object",
+            "properties": {
+              "icon": {
+                "type": "string",
+                "default": "fa fa-arrows-h"
+              },
+              "linkType": {
+                "enum": [
+                  "window",
+                  "tab",
+                  "none"
+                ],
+                "default": "window"
+              },
+              "sortKey": {
+                "type": "string",
+                "default": "S"
+              },
+              "windowDetails": {
+                "type": "string",
+                "default": "toolbar=0,location=0,scrollbars=1,statusbar=0,menubar=0,resizable=1,height=700,width=600"
+              },
+              "reuseWindow": {
+                "type": "boolean",
+                "default": true
+              },
+              "includeWorkbookParameters": {
+                "type": "boolean",
+                "default": true
+              }
+            },
+            "required": [
+              "icon",
+              "linkType",
+              "sortKey",
+              "windowDetails",
+              "reuseWindow",
+              "includeWorkbookParameters"
+            ]
+          },
+          "project": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        "required": [
+          "display"
+        ]
       },
-      {
-        "name": "Run Rules",
-        "identifier": "com.seeq.addon.spc-accelerator.udf",
-        "type": "FormulaPackage",
-        "path": "add-on/udf"
-      }
-    ]
-  }
-  
+      "configuration_filename": "configuration",
+      "configuration_converter": "json"
+    },
+    {
+      "name": "Nelson Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.nelson-run-rules",
+      "type": "FormulaPackage",
+      "path": "nelson-run-rules"
+    },
+    {
+      "name": "Western Electric Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.western-electric-run-rules",
+      "type": "FormulaPackage",
+      "path": "western-electric-run-rules"
+    }
+  ]
+}

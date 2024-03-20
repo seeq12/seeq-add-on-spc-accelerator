@@ -132,12 +132,7 @@ def create_control_chart(*args):
     worksheet_data_dict = create_template(
         URL, display_dict, histogram, input_condition, 
         start_select, end_select, workbook_button, workbook_id, 
-        worksheet_id, histogram_dict
-        )
-    
-    replaced_worksheet_data = json.dumps(worksheet_data_dict)
-    workbooks_api.create_workstep(
-        workbook_id=workbook_id, worksheet_id=worksheet_id,body={"data": replaced_worksheet_data}
+        histogram_dict
         )
     
     success.children = [f'''{num_completed} of {len(input_signal.v_model)} signals completed. Created {created_string} for {signal_name}. 
@@ -315,7 +310,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     western_electric_rules_df = pd.DataFrame([{
         'Name': f'{signal_name}: Western Electric Run Rule 1',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule1($minus3sd, $plus3sd)",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule1($minus3sd, $plus3sd)",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -3 Sigma'],
@@ -324,7 +319,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     },{
         'Name': f'{signal_name}: Western Electric Run Rule 2',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule2($minus2sd, $plus2sd, "+interp_value+")",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule2($minus2sd, $plus2sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -2 Sigma'],
@@ -333,7 +328,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     },{
         'Name': f'{signal_name}: Western Electric Run Rule 3',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule3($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule3($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -342,7 +337,7 @@ def western_electric_df(limits_push_df, mean_stddev_push_df, signal_name, interp
     },{
         'Name': f'{signal_name}: Western Electric Run Rule 4',
         'Type': 'Condition',
-        'Formula': "$inputsignal.WesternElectric_RunRule4($mean, "+interp_value+")",
+        'Formula': "$inputsignal.WesternElectricRunRules_RunRule4($mean, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean']
@@ -355,7 +350,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     nelson_rules_df = pd.DataFrame([{
         'Name': f'{signal_name}: Nelson Run Rule 1',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule1($minus3sd, $plus3sd)",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule1($minus3sd, $plus3sd)",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus3sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -3 Sigma'],
@@ -364,7 +359,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 2',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule2($mean, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule2($mean, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$mean': mean_stddev_push_df[mean_stddev_push_df['Name'] == f'{signal_name}: Mean']
@@ -372,21 +367,21 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 3',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule3("+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule3("+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name]
         }
     },{
         'Name': f'{signal_name}: Nelson Run Rule 4',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule4("+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule4("+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name]
         }
     },{
         'Name': f'{signal_name}: Nelson Run Rule 5',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule5($minus2sd, $plus2sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule5($minus2sd, $plus2sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus2sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -2 Sigma'],
@@ -395,7 +390,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 6',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule6($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule6($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -404,7 +399,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 7',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule7($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule7($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -413,7 +408,7 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
     },{
         'Name': f'{signal_name}: Nelson Run Rule 8',
         'Type': 'Condition',
-        'Formula': "$inputsignal.Nelson_RunRule8($minus1sd, $plus1sd, "+interp_value+")",
+        'Formula': "$inputsignal.NelsonRunRules_RunRule8($minus1sd, $plus1sd, "+interp_value+")",
         'Formula Parameters': {
             '$inputsignal': signals[signals['Name'] == signal_name],
             '$minus1sd': limits_push_df[limits_push_df['Name'] == f'{signal_name}: -1 Sigma'],
@@ -440,42 +435,48 @@ def create_histogram(signal_df, start_time, end_time, input_condition, condition
     itemsAPI = sdk.ItemsApi(spy.client)
     
     data = spy.pull(signal_df, grid=None, quiet=True, start=start_time, end=end_time)
-    signal_name = signal_df['Name'].iloc[0]
-    if isinstance(capsule_property.v_model, str):
-        max_value = data[signal_name].max()+1*data[signal_name].std()
-        min_value = data[signal_name].min()-1*data[signal_name].std()
-        number_of_bins = 2*math.ceil((1+3.322*math.log10(data[signal_name].count())))
-        fxn_input_step1 = sdk.FunctionInputV1(name=f'{signal_name} Histogram', scoped_to=workbook_id, type="Chart" , 
-                        formula = 'conditionTable($condition1.toGroup($viewCapsule, CapsuleBoundary.Intersect), "'+capsule_property.v_model+'", $yValueSignal2.toStates(capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+')).toCondition("yValueCol2").toGroup($viewCapsule, CapsuleBoundary.Intersect), "yValueCol2").addStatColumn("signalToAggregate", $signalToAggregate, count())',                      
-                        parameters= [
-                            sdk.FormulaParameterInputV1(name='condition1', id=conditions[conditions['Name']==input_condition.v_model]['ID'].iloc[0]),
-                            sdk.FormulaParameterInputV1(name='yValueSignal2', id=signal_df['ID'].iloc[0]),
-                            sdk.FormulaParameterInputV1(name='signalToAggregate', id=signal_df['ID'].iloc[0]),
-                            sdk.FormulaParameterInputV1(unbound=True, name='viewCapsule', formula='capsule("'+str(start_time)+'", "'+str(end_time)+'")')
-                        ])
-        step1 = formulaAPI.create_function(body = fxn_input_step1)
-        # Setting UIConfig property to mimic Histogram Tool UI
-        step2 = itemsAPI.set_property(property_name = "UIConfig" , id = step1.id, 
-                                      body = sdk.PropertyInputV1(value = '{"type":"aggregation-bins-table","advancedParametersCollapsed":true,"mode":"by_y_value","includeEmptyBuckets":false,"yValueSignal1":"","stat":{"key":"count","timeUnits":"s","percentile":null},"aggregationConfigs":[{"id":1,"mode":"by_condition","capsuleMode":"intersect","yValueBinMode":"number","valid":true,"yValueBinMin":'+str(min_value)+',"yValueBinMax":'+str(max_value)+',"numberOfBins":"'+str(number_of_bins)+'","conditionProperty":"'+capsule_property.v_model+'"},{"id":2,"mode":"by_y_value","capsuleMode":"intersect","yValueBinMode":"number","valid":true,"yValueBinMin":'+str(min_value)+',"yValueBinMax":'+str(max_value)+',"numberOfBins":"'+str(number_of_bins)+'","conditionProperty":"'+capsule_property.v_model+'"}]}')
-                                     )
+    signal_name = signal_df["Name"].iloc[0]
+    matching_columns = [col for col in data.columns if signal_name in col]
+    if matching_columns:
+        if isinstance(capsule_property.v_model, str):
+            column_name = matching_columns[0]
+            max_value = data[column_name].mean() + 4 * data[column_name].std()
+            min_value = data[column_name].mean() - 4 * data[column_name].std()
+            number_of_bins = 2*math.ceil((1+3.322*math.log10(data[column_name].count())))
+            fxn_input_step1 = sdk.FunctionInputV1(name=f'{signal_name} Histogram', scoped_to=workbook_id, type="Chart" , 
+                            formula = 'conditionTable($condition1.toGroup($viewCapsule, CapsuleBoundary.Intersect), "'+capsule_property.v_model+'", $yValueSignal2.toStates(capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+')).toCondition("yValueCol2").toGroup($viewCapsule, CapsuleBoundary.Intersect), "yValueCol2").addStatColumn("signalToAggregate", $signalToAggregate, count())',                      
+                            parameters= [
+                                sdk.FormulaParameterInputV1(name='condition1', id=conditions[conditions['Name']==input_condition.v_model]['ID'].iloc[0]),
+                                sdk.FormulaParameterInputV1(name='yValueSignal2', id=signal_df['ID'].iloc[0]),
+                                sdk.FormulaParameterInputV1(name='signalToAggregate', id=signal_df['ID'].iloc[0]),
+                                sdk.FormulaParameterInputV1(unbound=True, name='viewCapsule', formula='capsule("'+str(start_time)+'", "'+str(end_time)+'")')
+                            ])
+            step1 = formulaAPI.create_function(body = fxn_input_step1)
+            # Setting UIConfig property to mimic Histogram Tool UI
+            step2 = itemsAPI.set_property(property_name = "UIConfig" , id = step1.id, 
+                                          body = sdk.PropertyInputV1(value = '{"type":"aggregation-bins-table","advancedParametersCollapsed":true,"mode":"by_y_value","includeEmptyBuckets":false,"yValueSignal1":"","stat":{"key":"count","timeUnits":"s","percentile":null},"aggregationConfigs":[{"id":1,"mode":"by_condition","capsuleMode":"intersect","yValueBinMode":"number","valid":true,"yValueBinMin":'+str(min_value)+',"yValueBinMax":'+str(max_value)+',"numberOfBins":"'+str(number_of_bins)+'","conditionProperty":"'+capsule_property.v_model+'"},{"id":2,"mode":"by_y_value","capsuleMode":"intersect","yValueBinMode":"number","valid":true,"yValueBinMin":'+str(min_value)+',"yValueBinMax":'+str(max_value)+',"numberOfBins":"'+str(number_of_bins)+'","conditionProperty":"'+capsule_property.v_model+'"}]}')
+                                         )
+            # Running of histogram function to actually create the histogram
+            step3 = formulaAPI.run_formula(function = step1.id, fragments = ['viewCapsule=capsule("'+str(start_time)+'","'+str(end_time)+'")'])        
+        else:
+            column_name = matching_columns[0]
+            max_value = data[column_name].mean() + 4 * data[column_name].std()
+            min_value = data[column_name].mean() - 4 * data[column_name].std()
+            number_of_bins = math.ceil((1+3.322*math.log10(data[column_name].count())))
+            fxn_input_step1 = sdk.FunctionInputV1(name=f'{signal_name} Histogram', scoped_to=workbook_id, type="Chart" , 
+                            formula = 'conditionTable($yValueSignal1.toStates(capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+')).toCondition("yValueCol1").toGroup($viewCapsule, CapsuleBoundary.Intersect), "yValueCol1", capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+').property("value")).addStatColumn("signalToAggregate", $signalToAggregate, count())',                      
+                            parameters= [
+                                sdk.FormulaParameterInputV1(name='yValueSignal1', id=signal_df['ID'].iloc[0]),
+                                sdk.FormulaParameterInputV1(name='signalToAggregate', id=signal_df['ID'].iloc[0]),
+                                sdk.FormulaParameterInputV1(unbound=True, name='viewCapsule', formula='capsule("'+str(start_time)+'", "'+str(end_time)+'")')
+                            ])
+            step1 = formulaAPI.create_function(body = fxn_input_step1)
+            # Setting UIConfig property to mimic Histogram Tool UI
+            step2 = itemsAPI.set_property(property_name = "UIConfig" , id = step1.id, 
+                                          body = sdk.PropertyInputV1(value = '{"type":"aggregation-bins-table","advancedParametersCollapsed":true,"mode":"by_y_value","includeEmptyBuckets":false,"yValueSignal1":"","stat":{"key":"count","timeUnits":"s","percentile":null},"aggregationConfigs":[{"id":1,"mode":"by_y_value","capsuleMode":"intersect","yValueBinMode":"number","valid":true,"yValueBinMin":'+str(min_value)+',"yValueBinMax":'+str(max_value)+',"numberOfBins":"'+str(number_of_bins)+'"}]}')
+                                         )
         # Running of histogram function to actually create the histogram
-        step3 = formulaAPI.run_formula(function = step1.id, fragments = ['viewCapsule=capsule("'+str(start_time)+'","'+str(end_time)+'")'])        
+        step3 = formulaAPI.run_formula(function = step1.id, fragments = [f'viewCapsule=capsule("{start_time}","{end_time}")'])
     else:
-        max_value = data[signal_name].mean()+4*data[signal_name].std()
-        min_value = data[signal_name].mean()-4*data[signal_name].std()
-        number_of_bins = math.ceil((1+3.322*math.log10(data[signal_name].count())))
-        fxn_input_step1 = sdk.FunctionInputV1(name=f'{signal_name} Histogram', scoped_to=workbook_id, type="Chart" , 
-                        formula = 'conditionTable($yValueSignal1.toStates(capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+')).toCondition("yValueCol1").toGroup($viewCapsule, CapsuleBoundary.Intersect), "yValueCol1", capsule('+str(min_value)+', '+str(max_value)+').partition('+str((max_value-min_value)/number_of_bins)+').property("value")).addStatColumn("signalToAggregate", $signalToAggregate, count())',                      
-                        parameters= [
-                            sdk.FormulaParameterInputV1(name='yValueSignal1', id=signal_df['ID'].iloc[0]),
-                            sdk.FormulaParameterInputV1(name='signalToAggregate', id=signal_df['ID'].iloc[0]),
-                            sdk.FormulaParameterInputV1(unbound=True, name='viewCapsule', formula='capsule("'+str(start_time)+'", "'+str(end_time)+'")')
-                        ])
-        step1 = formulaAPI.create_function(body = fxn_input_step1)
-        # Setting UIConfig property to mimic Histogram Tool UI
-        step2 = itemsAPI.set_property(property_name = "UIConfig" , id = step1.id, 
-                                      body = sdk.PropertyInputV1(value = '{"type":"aggregation-bins-table","advancedParametersCollapsed":true,"mode":"by_y_value","includeEmptyBuckets":false,"yValueSignal1":"","stat":{"key":"count","timeUnits":"s","percentile":null},"aggregationConfigs":[{"id":1,"mode":"by_y_value","capsuleMode":"intersect","yValueBinMode":"number","valid":true,"yValueBinMin":'+str(min_value)+',"yValueBinMax":'+str(max_value)+',"numberOfBins":"'+str(number_of_bins)+'"}]}')
-                                     )
-        # Running of histogram function to actually create the histogram
-        step3 = formulaAPI.run_formula(function = step1.id, fragments = ['viewCapsule=capsule("'+str(start_time)+'","'+str(end_time)+'")'])
+        print(f"No column found in data matching '{signal_name}'.")
     return step1.id

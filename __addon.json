@@ -1,0 +1,26 @@
+{
+  "identifier": "com.seeq.addon.spc-accelerator",
+  "name": "SPC Accelerator",
+  "description": "DESCRIPTION HERE",
+  "version": "0.1.0",
+  "license": "Apache 2.0",
+  "icon": "fa fa-wrench",
+  "maintainer": "Seeq Corporation",
+  "previews": [
+    "docs/source/_static/preview.png"
+  ],
+  "elements": [
+    {
+      "name": "Nelson Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.nelson-run-rules",
+      "type": "FormulaPackage",
+      "path": "nelson-run-rules"
+    },
+    {
+      "name": "Western Electric Run Rules",
+      "identifier": "com.seeq.addon.spc-accelerator.western-electric-run-rules",
+      "type": "FormulaPackage",
+      "path": "western-electric-run-rules"
+    }
+  ]
+}

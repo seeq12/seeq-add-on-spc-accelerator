@@ -136,12 +136,21 @@ sdk/
 *.addon
 *.addonmeta
 
+# local notes
+TODO.md
+testing.ipynb
+
 # bin folder
 bin/
 
 # python venv
 venv/
+.venv/
 ```
+
+# pycache
+__pycache__/
+.pytest_cache/
 
 # built documentation
 /docs/build/
