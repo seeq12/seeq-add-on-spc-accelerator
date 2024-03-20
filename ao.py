@@ -9,7 +9,6 @@ import zipfile
 import base64
 import json
 from typing import Optional, List
-import jsonschema
 import venv
 
 
