@@ -30,7 +30,7 @@ jobs:
         python-version: "3.8"
     - name: Bootstrap Add-on
       run: |
-        ./ao bootstrap --url env.url --username env.username --password env.password
+        ./ao bootstrap --url ${{ secrets.URL }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
     - name: Deploy to Seeq Instance
       run: |
         ./ao deploy --clean
