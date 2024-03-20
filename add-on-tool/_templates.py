@@ -4,7 +4,7 @@ import json
 
 workbooks_api = sdk.WorkbooksApi(spy.client)
     
-def create_template(URL, display_dict, histogram, input_condition, start_select, end_select, workbook_button, workbook_id, worksheet, histogram_dict):
+def create_template(URL, display_dict, histogram, input_condition, start_select, end_select, workbook_button, workbook_id, histogram_dict):
     wb = spy.workbooks.pull(URL, quiet=True)
     ws = wb[0].worksheets
     new_worksheet_ids = []
