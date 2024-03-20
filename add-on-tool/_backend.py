@@ -135,11 +135,6 @@ def create_control_chart(*args):
         histogram_dict
         )
     
-    # replaced_worksheet_data = json.dumps(worksheet_data_dict)
-    # workbooks_api.create_workstep(
-    #     workbook_id=workbook_id, worksheet_id=worksheet_id,body={"data": replaced_worksheet_data}
-    #     )
-    
     success.children = [f'''{num_completed} of {len(input_signal.v_model)} signals completed. Created {created_string} for {signal_name}. 
         Formatting complete. Click link to be taken to the results.''']
 
