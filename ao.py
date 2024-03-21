@@ -255,6 +255,29 @@ def build(args=None):
         get_module(element_path).build()
 
 
+def uninstall(args):
+    from build.add_on import AddOnManagerSession
+
+    url, username, password = _parse_url_username_password(args)
+    add_on_identifier = get_add_on_identifier()
+    session = AddOnManagerSession(url, username, password)
+    print("Checking if Add-on is installed")
+    add_on_response = session.get_add_on(add_on_identifier)
+    if add_on_response.json().get("add_on_status") == "CanUninstall":
+        print("Uninstalling add-on")
+        uninstall_response = session.uninstall_add_on(add_on_identifier, force=False)
+        if not uninstall_response.ok:
+            if (
+                uninstall_response.json()["error"]["message"]
+                == f"No installed Add-on found with identifier {get_add_on_identifier()}"
+            ):
+                raise Exception("Add-on not installed or is unable to be uninstalled")
+            else:
+                uninstall_response.text
+                uninstall_response.raise_for_status()
+    print("Uninstall complete")
+
+
 def deploy(args):
     "Package and deploy the add-on to the server; assumes AoM is installed"
     from build.add_on import AddOnManagerSession
@@ -267,28 +290,7 @@ def deploy(args):
     # if clean, uninstall the add-on via AoM
     # TODO: allow force uninstall flag
     if args.clean:
-        print("Checking if Add-on is installed")
-        add_on_response = session.get_add_on(add_on_identifier)
-        if add_on_response.json().get("add_on_status") == "CanUninstall":
-            print("Uninstalling add-on")
-            uninstall_response = session.uninstall_add_on(
-                add_on_identifier, force=False
-            )
-            if not uninstall_response.ok:
-                if (
-                    uninstall_response.json()["error"]["message"]
-                    == f"No installed Add-on found with identifier {get_add_on_identifier()}"
-                ):
-                    raise Exception(
-                        "Add-on not installed or is unable to be uninstalled"
-                    )
-                else:
-                    uninstall_response.text
-                    uninstall_response.raise_for_status()
-        else:
-            print(
-                "Add-on either not present or is not in a state to be uninstalled. Skipping uninstall"
-            )
+        uninstall(args)
 
     # upload the add-on
     print("Uploading add-on")
@@ -311,30 +313,11 @@ def deploy(args):
     install_response = session.install_add_on(
         add_on_identifier, upload_response_body["binary_filename"], configuration
     )
+    if not install_response.ok:
+        error = install_response.json()["error"]
+        raise Exception(f"Error installing Add-on: {error['message']}")
     install_response.raise_for_status()
     print("Deployment to Add On Manager Complete")
-
-
-def deploy_old(args):
-    url, username, password = _parse_url_username_password(args)
-    if args.dir is None:
-        path_to_python = get_module("data-lab-functions").PATH_TO_PYTHON
-        command_to_run = (
-            f"{path_to_python} data-lab-functions/deploy.py"
-            f" --username {username} --password {password} --url {url}"
-        )
-        if args.clean:
-            command_to_run += " --clean"
-        if args.replace:
-            command_to_run += " --replace"
-        subprocess.run(command_to_run, shell=True, check=True)
-    else:
-        target_elements = filter_element_paths(
-            get_element_paths(), get_folders_from_args(args)
-        )
-        for element_path in target_elements:
-            print(f"Deploying element: {element_path}")
-            get_module(element_path).deploy(url, username, password)
 
 
 def package(args=None):
@@ -500,6 +483,14 @@ if __name__ == "__main__":
         help="Execute the command for the subset of the element directories specified.",
     )
     parser_test.set_defaults(func=elements_test)
+
+    parser_uninstall = subparsers.add_parser(
+        "uninstall", help="Uninstall the add-on from the Add-on Manager"
+    )
+    parser_uninstall.add_argument("--username", type=str)
+    parser_uninstall.add_argument("--password", type=str)
+    parser_uninstall.add_argument("--url", type=str)
+    parser_uninstall.set_defaults(func=uninstall)
 
     options, unknown = parser.parse_known_args()
     if hasattr(options, "suffix") and options.suffix is not None:
