@@ -195,6 +195,17 @@ def bootstrap(args):
     )
     # create the virtual build environment
     _create_virtual_environment(args.clean)
+    # Determine the path to the site-packages directory in the virtual environment
+    if WINDOWS_OS:
+        site_packages_path = VIRTUAL_ENVIRONMENT_PATH / "Lib" / "site-packages"
+    else:
+        site_packages_path = (
+            VIRTUAL_ENVIRONMENT_PATH
+            / "lib"
+            / f"python{sys.version_info.major}.{sys.version_info.minor}"
+            / "site-packages"
+        )
+    sys.path.append(str(site_packages_path))
     target_elements = filter_element_paths(
         get_element_paths(), get_folders_from_args(args)
     )
