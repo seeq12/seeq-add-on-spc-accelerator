@@ -12,6 +12,17 @@ def load_json(path: pathlib.Path) -> Optional[dict]:
         return json.load(json_file)
 
 
+def load_jsonnet(path: pathlib.Path, tla_vars=None, save=False) -> Optional[dict]:
+    from _jsonnet import evaluate_file
+
+    if not path.exists():
+        return None
+    evaluated_jsonnet = json.loads(evaluate_file(path.as_posix(), tla_vars=tla_vars))
+    if save:
+        save_json(path.with_suffix(".json"), evaluated_jsonnet)
+    return evaluated_jsonnet
+
+
 def save_json(path: pathlib.Path, values: dict) -> None:
     with open(path, mode="w", encoding="utf-8") as json_file:
         json.dump(values, json_file, indent=2, ensure_ascii=False)

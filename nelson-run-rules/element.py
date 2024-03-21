@@ -7,6 +7,7 @@ import pathlib
 import subprocess
 import sys
 import venv
+import pathlib
 from datetime import datetime
 from os.path import isdir, relpath
 from typing import List
@@ -42,8 +43,28 @@ def get_build_dependencies() -> List[str]:
     return []
 
 
+def get_add_on_suffix():
+    return os.environ.get("ADD_ON_SUFFIX", "")
+
+
 def build() -> None:
-    pass
+    # conver the jsonnet files to json for packaging
+    from build import load_jsonnet, find_files_in_folder_recursively
+
+    jsonnet_vars = {
+        "suffix": get_add_on_suffix(),
+    }
+
+    files_to_convert = find_files_in_folder_recursively(
+        str(ELEMENT_PATH),
+        file_extensions={".jsonnet"},
+        excluded_files=EXCLUDED_FILES,
+        excluded_folders=EXCLUDED_FOLDERS,
+    )
+    for file in files_to_convert:
+        load_jsonnet(
+            ELEMENT_PATH / pathlib.Path(file), tla_vars=jsonnet_vars, save=True
+        )
 
 
 def deploy(url: str, username: str, password: str) -> None:

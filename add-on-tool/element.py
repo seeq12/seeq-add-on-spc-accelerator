@@ -53,7 +53,6 @@ def build() -> None:
 
 
 def deploy(url: str, username: str, password: str) -> None:
-    # TODO: Need to deploy using the add-on-manager
     # should not be delegated to the element, should be handled by ao.py
     pass
 

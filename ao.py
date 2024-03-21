@@ -23,6 +23,7 @@ from build import (
 PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
 WHEELS_PATH = PROJECT_PATH / ".wheels"
 ADDON_JSON_FILE = PROJECT_PATH / "addon.json"
+ADDON_JSONNET_FILE = PROJECT_PATH / "addon.jsonnet"
 BOOTSTRAP_JSON_FILE = PROJECT_PATH / ".bootstrap.json"
 
 WINDOWS_OS = os.name == "nt"
@@ -60,9 +61,14 @@ def create_package_filename(dist_base_filename: str, version: str) -> str:
 
 
 def get_add_on_json() -> Optional[dict]:
-    add_on_json = load_json(ADDON_JSON_FILE)
+    from build import load_jsonnet
+
+    jsonnet_vars = {
+        "suffix": get_add_on_suffix(),
+    }
+    add_on_json = load_jsonnet(ADDON_JSONNET_FILE, tla_vars=jsonnet_vars, save=True)
     if add_on_json is None:
-        raise Exception(f"{ADDON_JSON_FILE} file not found.")
+        raise Exception(f"{ADDON_JSONNET_FILE} file not found.")
     return add_on_json
 
 
@@ -79,6 +85,10 @@ def get_element_paths() -> List[str]:
         if not pathlib.Path(element_path).exists():
             raise Exception(f"Element path does not exist: {element_path}")
     return element_paths
+
+
+def get_add_on_suffix():
+    return os.environ.get("ADD_ON_SUFFIX", "")
 
 
 def get_add_on_identifier() -> str:
@@ -398,6 +408,8 @@ def _parse_url_username_password(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="ao.py", description="Add-on Manager")
+
+    parser.add_argument("--suffix", type=str)
     subparsers = parser.add_subparsers(help="sub-command help", required=True)
 
     parser_bootstrap = subparsers.add_parser(
@@ -479,4 +491,7 @@ if __name__ == "__main__":
     parser_test.set_defaults(func=elements_test)
 
     options, unknown = parser.parse_known_args()
+    if hasattr(options, "suffix") and options.suffix is not None:
+        os.environ["ADD_ON_SUFFIX"] = options.suffix
+
     options.func(options)

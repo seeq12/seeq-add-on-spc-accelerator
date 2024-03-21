@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Test & Deploy | Develop Channel
+name: Build & Test | Develop Channel
 
 on:
   push:
@@ -14,8 +14,33 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  buildDev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      url: ${{ secrets.URL }}
+      username: ${{ secrets.USERNAME }}
+      password: ${{ secrets.PASSWORD }}
+      PR_NUMBER: ${{ github.event.number }}
 
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.8"
+    - name: Bootstrap Add-on
+      run: |
+        ./ao bootstrap --url "$url" --username "$username" --password "$password"
+    - name: Test Add-on
+      run: |
+        ./ao test
+    - name: Deploy Add-on to Seeq Instance
+      run: |
+          ./ao --suffix="$PR_NUMBER" deploy --clean
+  
+  buildProd:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       url: ${{ secrets.URL }}
@@ -36,4 +61,4 @@ jobs:
         ./ao test
     - name: Deploy Add-on to Seeq Instance
       run: |
-        ./ao deploy --clean
+          ./ao deploy --clean

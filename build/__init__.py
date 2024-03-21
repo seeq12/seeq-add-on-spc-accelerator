@@ -18,3 +18,4 @@ from build.utils import (
 )
 
 from build.session import get_authenticated_session
+from build.utils import load_jsonnet
