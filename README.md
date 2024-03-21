@@ -1,5 +1,5 @@
 # seeq-add-on-spc-accelerator
-![Deploy & Test](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/deploy.yml/badge.svg)
+![Deploy & Test](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/test_deploy.yml/badge.svg)
 
 ## Development
 
