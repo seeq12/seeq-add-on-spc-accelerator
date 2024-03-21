@@ -5,6 +5,7 @@ import ipywidgets as ipw
 import ipyvuetify as v
 from IPython.display import display
 
+
 class SPCAccelerator:
     def __init__(self, URL, workbook_id, worksheet_id):
         self.URL = URL
