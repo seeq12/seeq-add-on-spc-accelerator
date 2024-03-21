@@ -1,0 +1,32 @@
+name: Uninstall on PR Close
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+permissions: 
+  contents: read
+
+jobs:
+  uninstall:
+    runs-on: ubuntu-latest
+    env:
+      url: ${{ secrets.URL }}
+      username: ${{ secrets.USERNAME }}
+      password: ${{ secrets.PASSWORD }}
+      PR_NUMBER: ${{ github.event.number }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.8"
+    - name: Bootstrap Add-on
+      run: |
+        ./ao bootstrap --url "$url" --username "$username" --password "$password"
+    - name: Deploy Add-on to Seeq Instance
+      run: |
+          ./ao --suffix="$PR_NUMBER" uninstall
+      
