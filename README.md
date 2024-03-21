@@ -33,6 +33,7 @@ Run the following command in a terminal from the root of the repository to deplo
 bash ao deploy [--clean]
 ```
 The optional `--clean` argument tries to uninstall the add-on from your Seeq server before reinstalling it.
+The optional `--suffix` argument will apply a suffix to all add-on identifiers when deploying. This is useful for deploying multiple versions of the same add-on to the same server.
 
 ***
 ### Package
