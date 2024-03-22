@@ -27,38 +27,6 @@ function(suffix='')
         configuration_schema: {
           type: 'object',
           properties: {
-            database: {
-              type: 'object',
-              properties: {
-                host: {
-                  type: 'string',
-                  default: 'yourAmazingHostname',
-                },
-                port: {
-                  type: 'string',
-                  default: '5432',
-                },
-                username: {
-                  type: 'string',
-                  default: 'yourCoolUsername',
-                },
-                password: {
-                  type: 'string',
-                  default: 'yourSecretPassword',
-                },
-                database: {
-                  type: 'string',
-                  default: 'yourAwesomeDatabase',
-                },
-              },
-              required: [
-                'host',
-                'port',
-                'username',
-                'password',
-                'database',
-              ],
-            },
             display: {
               type: 'object',
               properties: {
@@ -71,12 +39,19 @@ function(suffix='')
               },
               required: ['icon', 'linkType', 'sortKey', 'windowDetails', 'reuseWindow', 'includeWorkbookParameters'],
             },
-            project: { type: 'object', properties: {} },
+            [if suffix != '' then 'project']: {  // project should only be included for dev versions
+              type: 'object',
+              required: ['suffix'],
+              properties: {
+                // these properties will be included in a configuration.json file in the add-on-tool project
+                suffix: { type: 'string', default: suffix },
+              },
+            },
           },
-          required: ['display', 'database'],
+          required: ['display'] + if suffix != '' then ['project'] else [],
         },
-        // configuration_filename: 'configuration',
-        // configuration_converter: 'ini',
+        configuration_filename: 'configuration',  // name of the file dropped in the add-on-tool project
+        configuration_converter: 'json',  // options for ini, toml, json
       },
       {
         name: 'Nelson Run Rules',
