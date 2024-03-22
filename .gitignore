@@ -159,3 +159,11 @@ __pycache__/
 # switch from json to jsonnet, ignore the json files now
 addon.json
 formula_package.json
+
+
+# playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
