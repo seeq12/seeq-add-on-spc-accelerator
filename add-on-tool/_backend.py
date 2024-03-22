@@ -9,11 +9,11 @@ from _templates import create_template, format_histogram_worksheet
 
 # when deploying a test instance, need to append a suffix to the formula package names to prevent collisons
 try:
-    with open('configuration.json', 'r') as f:
+    with open("configuration.json", "r") as f:
         configuration = json.load(f)
-        ADD_ON_SUFFIX = configuration.get('suffix', '')
+        ADD_ON_SUFFIX = configuration.get("suffix", "")
 except:
-    ADD_ON_SUFFIX = ''
+    ADD_ON_SUFFIX = ""
 
 workbooks_api = sdk.WorkbooksApi(spy.client)
 formulaAPI = sdk.FormulasApi(spy.client)
