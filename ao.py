@@ -315,7 +315,8 @@ def deploy(args):
     )
     if not install_response.ok:
         error = install_response.json()["error"]
-        raise Exception(f"Error installing Add-on: {error['message']}")
+        error_message = error["message"]
+        raise Exception(f"Error installing Add-on: {error_message}")
     install_response.raise_for_status()
     print("Deployment to Add On Manager Complete")
 
