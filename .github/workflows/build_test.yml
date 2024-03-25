@@ -78,7 +78,7 @@ jobs:
           ./ao deploy --clean
   
   distributeProd:
-    name: Distribute Add-on | Production
+    name: Distribute | Production
     needs: buildProd
     runs-on: ubuntu-latest
     environment: prod
