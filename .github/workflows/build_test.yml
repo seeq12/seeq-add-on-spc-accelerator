@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   buildDev:
+    name: Build & Test | Development
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: dev
@@ -49,6 +50,7 @@ jobs:
           ./ao --suffix="$PR_NUMBER" distribute 
   
   buildProd:
+    name: Build & Test | Production
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
@@ -76,7 +78,7 @@ jobs:
           ./ao deploy --clean
   
   distributeProd:
-    name: Distribute Add-on to Prod Repo
+    name: Distribute Add-on | Production
     needs: buildProd
     runs-on: ubuntu-latest
     environment: prod
