@@ -42,6 +42,7 @@ PREVIEWS = "previews"
 ELEMENT_PATH = "path"
 ELEMENT_IDENTIFIER = "identifier"
 CONFIGURATION_SCHEMA = "configuration_schema"
+ARTIFACTORY_DIR = "artifactory_dir"
 
 DIST_FOLDER = PROJECT_PATH / "dist"
 ADD_ON_EXTENSION = ".addon"
@@ -94,6 +95,11 @@ def get_add_on_suffix():
 def get_add_on_identifier() -> str:
     add_on_json = get_add_on_json()
     return add_on_json[IDENTIFIER]
+
+
+def get_artifactory_dir() -> str:
+    add_on_json = get_add_on_json()
+    return add_on_json[ARTIFACTORY_DIR]
 
 
 def get_add_on_package_name() -> str:
@@ -321,6 +327,51 @@ def deploy(args):
     print("Deployment to Add On Manager Complete")
 
 
+def distribute(args):
+    from artifactory import ArtifactoryPath
+    from urllib.parse import urljoin
+
+    identifier = get_add_on_identifier()
+
+    token = os.getenv("ARTIFACTORY_TOKEN")
+    base_url = os.getenv("ARTIFACTORY_BASE_URL")
+    artifactory_dir = get_artifactory_dir()
+    artifactory_path = urljoin(base_url, artifactory_dir)
+    print(artifactory_path)
+    if not all([token, base_url]):
+        raise Exception(
+            "Please set ARTIFACTORY_TOKEN and ARTIFACTORY_BASE_URL environment variables"
+        )
+    path = ArtifactoryPath(artifactory_path, token=token)
+
+    package(args)
+
+    file_name = get_add_on_package_name()
+    artifact_file_name = DIST_FOLDER / f"{file_name}{ADD_ON_EXTENSION}"
+    metadata_file_name = DIST_FOLDER / f"{file_name}{ADD_ON_METADATA_EXTENSION}"
+    files_to_upload = [artifact_file_name, metadata_file_name]
+
+    # check that the addon and addonmeta files are there
+    if not all([artifact_file_name.exists(), metadata_file_name.exists()]):
+        raise Exception("Add-on package or metadata file not found")
+
+    if not path.exists():
+        print("Creating directory...")
+        path.mkdir()
+
+    # delete the old artifacts in that directory, only one can exist with same identifier
+    for file in path:
+        print(f"Deleting {file} in Artifactory")
+        file.unlink()
+
+    for file in files_to_upload:
+        print(f"Uploading {file}")
+        path.deploy_file(file)
+        (path / file.name).properties = {"identifier": identifier}
+
+    print("Done distributing")
+
+
 def package(args=None):
     print("Packaging")
     if not args.skip_build:
@@ -492,6 +543,14 @@ if __name__ == "__main__":
     parser_uninstall.add_argument("--password", type=str)
     parser_uninstall.add_argument("--url", type=str)
     parser_uninstall.set_defaults(func=uninstall)
+
+    parser_distribute = subparsers.add_parser(
+        "distribute", help="distribute add-on to artifactory"
+    )
+    parser_distribute.add_argument(
+        "--skip-build", action="store_true", default=False, help="Skip build step"
+    )
+    parser_distribute.set_defaults(func=distribute)
 
     options, unknown = parser.parse_known_args()
     if hasattr(options, "suffix") and options.suffix is not None:

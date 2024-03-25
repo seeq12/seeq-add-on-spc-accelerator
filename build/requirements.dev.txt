@@ -2,6 +2,7 @@ seeq
 seeq-spy
 wheel
 jsonnet
+dohq-artifactory
 pytest==7.4.2
 mock==5.1.0
 pycodestyle==2.10.0
