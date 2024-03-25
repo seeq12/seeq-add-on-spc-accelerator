@@ -1,10 +1,13 @@
 function(suffix='')
   local add_on_identifier = 'com.seeq.addon.spc-accelerator';  // unique identifier for add-on. Follow form com.seeq.addon.[name]
+  local add_on_name = 'SPC Accelerator';
   {
     local hyphen_suffix = if suffix == '' then '' else '-' + suffix,
+    local underscore_suffix = if suffix == '' then '' else '_' + suffix,
     local name_suffix = if suffix == '' then '' else ' [' + suffix + ']',
     identifier: add_on_identifier + hyphen_suffix,
-    name: 'SPC Accelerator' + name_suffix,
+    name: add_on_name + name_suffix,
+    artifactory_dir: std.asciiLower((std.strReplace(add_on_name, ' ', '_') + underscore_suffix)),  // used when deploying to artifactory
     description: 'DESCRIPTION HERE',  // this will show on the add-on manager
     version: '0.1.0',
     license: 'Apache 2.0',
