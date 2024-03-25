@@ -79,7 +79,7 @@ jobs:
     name: Distribute Add-on to Prod Repo
     needs: buildProd
     runs-on: ubuntu-latest
-    enviornment: prod
+    environment: prod
     env:
       url: ${{ secrets.URL }}
       username: ${{ secrets.USERNAME }}
