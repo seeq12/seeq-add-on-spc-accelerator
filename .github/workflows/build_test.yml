@@ -17,11 +17,14 @@ jobs:
   buildDev:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    environment: dev
     env:
       url: ${{ secrets.URL }}
       username: ${{ secrets.USERNAME }}
       password: ${{ secrets.PASSWORD }}
       PR_NUMBER: ${{ github.event.number }}
+      ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      ARTIFACTORY_BASE_URL: ${{ secrets.ARTIFACTORY_BASE_URL }}
 
     steps:
     - uses: actions/checkout@v4
@@ -41,6 +44,9 @@ jobs:
     - name: Deploy Add-on to Seeq Instance
       run: |
           ./ao --suffix="$PR_NUMBER" deploy --clean
+    - name: Distribute Add-on to Dev Repo
+      run: |
+          ./ao --suffix="$PR_NUMBER" distribute 
   
   buildProd:
     if: github.event_name == 'push'
@@ -68,3 +74,31 @@ jobs:
     - name: Deploy Add-on to Seeq Instance
       run: |
           ./ao deploy --clean
+  
+  distributeProd:
+    name: Distribute Add-on to Prod Repo
+    needs: buildProd
+    runs-on: ubuntu-latest
+    enviornment: prod
+    env:
+      url: ${{ secrets.URL }}
+      username: ${{ secrets.USERNAME }}
+      password: ${{ secrets.PASSWORD }}
+      ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      ARTIFACTORY_BASE_URL: ${{ secrets.ARTIFACTORY_BASE_URL }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.8"
+        cache: 'pip'
+        cache-dependency-path: |
+          **/requirements*.txt
+    - name: Bootstrap Add-on
+      run: |
+        ./ao bootstrap --url "$url" --username "$username" --password "$password"
+    - name: Distribute Add-on
+      run: |
+        ./ao distribute
