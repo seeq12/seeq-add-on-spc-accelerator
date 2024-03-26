@@ -113,6 +113,21 @@ def get_add_on_manager_api_url(project_id: str) -> str:
     return f"{base_url}/data-lab/{project_id}/functions/notebooks/addonmanagerAPI/endpoints/add-ons"
 
 
+def get_artifactory_path():
+    from artifactory import ArtifactoryPath
+    from urllib.parse import urljoin
+
+    token = os.getenv("ARTIFACTORY_TOKEN")
+    base_url = os.getenv("ARTIFACTORY_BASE_URL")
+    artifactory_dir = get_artifactory_dir()
+    artifactory_path = urljoin(base_url, artifactory_dir)
+    if not all([token, base_url]):
+        raise Exception(
+            "Please set ARTIFACTORY_TOKEN and ARTIFACTORY_BASE_URL environment variables"
+        )
+    return ArtifactoryPath(artifactory_path, token=token)
+
+
 def get_configuration():
     """
     Fetch the configuration of the add-on, used when deploying the add-on to add-on-manager.
@@ -327,22 +342,9 @@ def deploy(args):
     print("Deployment to Add On Manager Complete")
 
 
-def distribute(args):
-    from artifactory import ArtifactoryPath
-    from urllib.parse import urljoin
-
+def publish(args):
     identifier = get_add_on_identifier()
-
-    token = os.getenv("ARTIFACTORY_TOKEN")
-    base_url = os.getenv("ARTIFACTORY_BASE_URL")
-    artifactory_dir = get_artifactory_dir()
-    artifactory_path = urljoin(base_url, artifactory_dir)
-    print(artifactory_path)
-    if not all([token, base_url]):
-        raise Exception(
-            "Please set ARTIFACTORY_TOKEN and ARTIFACTORY_BASE_URL environment variables"
-        )
-    path = ArtifactoryPath(artifactory_path, token=token)
+    path = get_artifactory_path()
 
     package(args)
 
@@ -355,14 +357,12 @@ def distribute(args):
     if not all([artifact_file_name.exists(), metadata_file_name.exists()]):
         raise Exception("Add-on package or metadata file not found")
 
+    # delete the old artifacts, only one can exist with same identifier
+    unpublish(args, path)
+
     if not path.exists():
         print("Creating directory...")
         path.mkdir()
-
-    # delete the old artifacts in that directory, only one can exist with same identifier
-    for file in path:
-        print(f"Deleting {file} in Artifactory")
-        file.unlink()
 
     for file in files_to_upload:
         print(f"Uploading {file}")
@@ -370,6 +370,26 @@ def distribute(args):
         (path / file.name).properties = {"identifier": identifier}
 
     print("Done distributing")
+
+
+def unpublish(args, artifactory_path=None):
+    if artifactory_path is None:
+        artifactory_path = get_artifactory_path()
+
+    if not artifactory_path.exists():
+        print("Nothing to unpublish")
+        return
+
+    # delete the old artifacts in that directory
+    for file in artifactory_path:
+        print(f"Deleting {file} in Artifactory")
+        file.unlink()
+
+    # then delete the directory
+    print(f"Deleting {artifactory_path.name} in Artifactory")
+    artifactory_path.unlink()
+
+    print("Done unpublishing")
 
 
 def package(args=None):
@@ -544,13 +564,19 @@ if __name__ == "__main__":
     parser_uninstall.add_argument("--url", type=str)
     parser_uninstall.set_defaults(func=uninstall)
 
-    parser_distribute = subparsers.add_parser(
-        "distribute", help="distribute add-on to artifactory"
+    parser_publish = subparsers.add_parser(
+        "publish", help="distribute add-on to artifactory"
     )
-    parser_distribute.add_argument(
+    parser_publish.add_argument(
         "--skip-build", action="store_true", default=False, help="Skip build step"
     )
-    parser_distribute.set_defaults(func=distribute)
+    parser_publish.set_defaults(func=publish)
+
+    parser_unpublish = subparsers.add_parser(
+        "unpublish", help="distribute add-on to artifactory"
+    )
+
+    parser_unpublish.set_defaults(func=unpublish)
 
     options, unknown = parser.parse_known_args()
     if hasattr(options, "suffix") and options.suffix is not None:
