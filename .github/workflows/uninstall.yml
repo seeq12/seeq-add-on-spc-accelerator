@@ -11,11 +11,14 @@ permissions:
 jobs:
   uninstall:
     runs-on: ubuntu-latest
+    environment: development
     env:
       url: ${{ secrets.URL }}
       username: ${{ secrets.USERNAME }}
       password: ${{ secrets.PASSWORD }}
       PR_NUMBER: ${{ github.event.number }}
+      ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      ARTIFACTORY_BASE_URL: ${{ secrets.ARTIFACTORY_BASE_URL }}
 
     steps:
     - uses: actions/checkout@v4
@@ -29,7 +32,10 @@ jobs:
     - name: Bootstrap Add-on
       run: |
         ./ao bootstrap --url "$url" --username "$username" --password "$password"
-    - name: Deploy Add-on to Seeq Instance
+    - name: Uninstall Add-on on Seeq Instance
       run: |
           ./ao --suffix="$PR_NUMBER" uninstall
-      
+    - name: Unpublish Add-on from Dev Repo
+      run: |
+          ./ao --suffix="$PR_NUMBER" unpublish
+  
