@@ -128,7 +128,7 @@ async def hot_reload(url: str, username: str, password: str):
                         absolute_file_path,
                         destination,
                     )
-                _shut_down_kernel(url, requests_session, auth_header, project_id)
+                # _shut_down_kernel(url, requests_session, auth_header, project_id)
 
 
 def _shut_down_kernel(url: str, requests_session, auth_header, project_id):
