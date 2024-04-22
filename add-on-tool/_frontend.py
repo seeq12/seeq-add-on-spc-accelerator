@@ -65,7 +65,7 @@ def frontend(signal_list, condition_list, start_time, end_time):
         type="error",
         dense=True,
         value=False,
-        class_="mt-5",
+        class_="mt-3",
         children=["Training Window: Start date must be before end date"],
     )
     success = v.Alert(
@@ -73,7 +73,7 @@ def frontend(signal_list, condition_list, start_time, end_time):
         dense=True,
         value=False,
         children=[],
-        class_="mt-5",
+        class_="mt-3",
     )
 
     return (
