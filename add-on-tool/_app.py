@@ -13,6 +13,11 @@ class SPCAccelerator:
         padding: 0px !important;
     }
 
+    .v-application .primary--text {
+        color: var(--dark-primary-analysis) !important;
+        caret-color: var(--dark-primary-analysis) !important;
+    }
+
     .vuetify-styles .v-label {
         font-size: 14px;
     }
@@ -35,7 +40,9 @@ class SPCAccelerator:
         background-color: var(--dark-primary-analysis) !important;
         border-color: var(--dark-primary-analysis) !important;
         color: white !important;
-        width: 150px;
+        font-weight: normal !important;
+        text-transform: unset !important;
+        width: 125px;
     }
     
     .execute-container {
