@@ -7,6 +7,49 @@ from IPython.display import display
 
 
 class SPCAccelerator:
+    DOCS_URL = "https://seeq12.github.io/seeq-add-on-spc-accelerator/user_guide.html"
+    ADDITIONAL_CSS = """
+    .jp-Notebook {
+        padding: 0px !important;
+    }
+
+    .v-application .primary--text {
+        color: var(--dark-primary-analysis) !important;
+        caret-color: var(--dark-primary-analysis) !important;
+    }
+
+    .vuetify-styles .v-label {
+        font-size: 14px;
+    }
+
+    .vuetify-styles .v-input {
+        font-size: 14px;
+    }
+
+    .vuetify-styles .v-application {
+        font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+        font-size: 14px;
+    }
+
+    .vuetify-styles .v-input--selection-controls {
+        margin-top: 0px;
+        padding-top: 0px;
+    }
+
+    .execute {
+        background-color: var(--dark-primary-analysis) !important;
+        border-color: var(--dark-primary-analysis) !important;
+        color: white !important;
+        font-weight: normal !important;
+        text-transform: unset !important;
+        width: 125px;
+    }
+    
+    .execute-container {
+        justify-content: center;
+    }
+    """
+
     def __init__(self, URL, workbook_id, worksheet_id):
         self.URL = URL
         self.workbook_id = workbook_id
@@ -94,40 +137,76 @@ class SPCAccelerator:
 
     def run(self):
         display(
-            ipw.VBox(
+            v.App(
                 children=[
-                    ipw.HBox(
-                        [
-                            ipw.HTML(
-                                value="<font size='+0'><b>Create Statistical Process Control (SPC) control charts and apply run rules to signals on the worksheet. </b></font size>"
-                            ),
+                    v.Html(
+                        tag="style",
+                        children=[SPCAccelerator.ADDITIONAL_CSS],
+                    ),
+                    v.AppBar(
+                        children=[
+                            v.ToolbarTitle(children=["SPC Accelerator"]),
+                            v.Spacer(),
                             v.Btn(
-                                children=[v.Icon(children=["mdi-information-outline"])],
-                                color="success",
-                                fab=True,
-                                outlined=True,
-                                x_small=True,
-                                href="https://seeq.atlassian.net/wiki/spaces/SQ/pages/2410381326/Run+Rules",
+                                icon=True,
+                                children=[v.Icon(children=["fa-question-circle"])],
+                                href=SPCAccelerator.DOCS_URL,
                                 target="_blank",
                             ),
-                        ]
+                        ],
+                        color="#007960",
+                        dark=True,
+                        dense=True,
                     ),
-                    self.input_signal,
-                    ipw.HBox([self.signal_interpolation, self.interpolation_units]),
-                    self.input_condition,
-                    self.capsule_property,
-                    v.Label(children=["Training Window: "]),
-                    self.start_select,
-                    self.end_select,
-                    self.apply_to_condition,
-                    v.Label(children=["Desired Outputs: "]),
-                    self.control_chart,
-                    self.we_runrules,
-                    self.nelson_runrules,
-                    self.histogram,
-                    ipw.HBox([self.button, self.workbook_button]),
-                    self.error,
-                    self.success,
-                ]
+                    v.Html(
+                        tag="div",
+                        class_="d-flex flex-column pl-3 pr-3",
+                        children=[
+                            self.input_signal,
+                            v.Html(
+                                tag="div",
+                                class_="d-flex flex-row",
+                                children=[
+                                    self.signal_interpolation,
+                                    self.interpolation_units,
+                                ],
+                            ),
+                            self.input_condition,
+                            self.capsule_property,
+                            v.Html(
+                                tag="div",
+                                children=["Training Window:"],
+                            ),
+                            self.start_select,
+                            self.end_select,
+                            self.apply_to_condition,
+                            v.Html(
+                                tag="div",
+                                class_="pb-4",
+                                children=["Desired Outputs:"],
+                            ),
+                            v.Html(
+                                tag="div",
+                                class_="d-flex flex-column ml-4",
+                                children=[
+                                    self.control_chart,
+                                    self.we_runrules,
+                                    self.nelson_runrules,
+                                    self.histogram,
+                                ],
+                            ),
+                            v.Html(
+                                tag="div",
+                                class_="d-flex flex-row execute-container",
+                                children=[
+                                    self.button,
+                                    self.workbook_button,
+                                ],
+                            ),
+                            self.error,
+                            self.success,
+                        ],
+                    ),
+                ],
             )
         )

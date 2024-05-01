@@ -36,7 +36,7 @@ function(suffix='')
                 icon: { type: 'string', default: 'fa fa-arrows-h' },
                 linkType: { enum: ['window', 'tab', 'none'], default: 'window' },
                 sortKey: { type: 'string', default: 'S' },
-                windowDetails: { type: 'string', default: 'toolbar=0,location=0,scrollbars=1,statusbar=0,menubar=0,resizable=1,height=700,width=600' },
+                windowDetails: { type: 'string', default: 'toolbar=0,location=0,scrollbars=1,statusbar=0,menubar=0,resizable=1,height=925,width=425' },
                 reuseWindow: { type: 'boolean', default: true },
                 includeWorkbookParameters: { type: 'boolean', default: true },
               },

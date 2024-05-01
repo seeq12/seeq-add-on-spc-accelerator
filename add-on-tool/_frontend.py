@@ -9,19 +9,16 @@ def frontend(signal_list, condition_list, start_time, end_time):
         items=signal_list,
         multiple=True,
         label="Input Signal",
-        style_="width: 400px",
         no_data_text="No signals found on worksheet",
     )
     signal_interpolation = v.TextField(
         v_model=40,
         type="number",
         label="Maximum Signal Interpolation",
-        style_="width: 200px",
     )
     interpolation_units = v.Select(
         items=["second(s)", "minute(s)", "hour(s)", "day(s)"],
         v_model="hour(s)",
-        style_="width: 200px",
     )
 
     input_condition = v.Select(
@@ -29,7 +26,6 @@ def frontend(signal_list, condition_list, start_time, end_time):
         items=condition_list,
         label="(Optional) Condition Filter",
         clearable=True,
-        style_="width: 400px",
         no_data_text="No conditions found on worksheet",
     )
     capsule_property = v.Select(
@@ -37,7 +33,6 @@ def frontend(signal_list, condition_list, start_time, end_time):
         items=property_list,
         label="(Optional) Separate By Capsule Property",
         clearable=True,
-        style_="width: 400px",
         no_data_text="No properties found on condition",
     )
 
@@ -51,7 +46,6 @@ def frontend(signal_list, condition_list, start_time, end_time):
         items=condition_list,
         label="Apply to Condition",
         disabled=True,
-        style_="width: 400px",
         no_data_text="No conditions found on worksheet",
     )
 
@@ -60,7 +54,7 @@ def frontend(signal_list, condition_list, start_time, end_time):
     nelson_runrules = v.Checkbox(v_model=False, label="Nelson Run Rules")
     histogram = v.Checkbox(v_model=False, label="Histogram Normality Check")
 
-    button = v.Btn(children=["Execute"], color="success", loading=False, width="200px")
+    button = v.Btn(children=["Execute"], class_="execute mr-1", loading=False)
     workbook_button = v.Btn(
         children=[v.Icon(children=["mdi-open-in-new"])],
         color="primary",
@@ -71,9 +65,16 @@ def frontend(signal_list, condition_list, start_time, end_time):
         type="error",
         dense=True,
         value=False,
-        children=["Training Window: End time must be after start time."],
+        class_="mt-3",
+        children=["Training Window: Start date must be before end date"],
     )
-    success = v.Alert(type="success", dense=True, value=False, children=[])
+    success = v.Alert(
+        type="success",
+        dense=True,
+        value=False,
+        children=[],
+        class_="mt-3",
+    )
 
     return (
         input_signal,
