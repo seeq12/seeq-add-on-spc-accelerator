@@ -169,6 +169,16 @@ def get_element_identifier_from_path(element_path: pathlib.Path) -> str:
     )
 
 
+def get_element_config_from_identifier(element_identifier: str):
+    add_on_json = get_add_on_json()
+    elements = add_on_json[ELEMENTS]
+    return next(
+        element
+        for element in elements
+        if element[ELEMENT_IDENTIFIER] == element_identifier
+    )
+
+
 def filter_element_paths(
     element_paths: Optional[List[str]], subset_folders: Optional[List[str]]
 ):

@@ -3,17 +3,26 @@ def get_authenticated_session(
 ):
     from seeq import sdk, spy
 
-    spy.login(username=username, password=password, url=url, quiet=True)
+    spy_session = spy.Session()
+    spy.login(
+        username=username, password=password, url=url, quiet=True, session=spy_session
+    )
     auth_header = {"sq-auth": spy.client.auth_token}
-    items_api = sdk.ItemsApi(spy.client)
+    project_id = get_project_id_from_name(project_name, spy_session)
+    requests_session = _create_requests_session()
+    return requests_session, auth_header, project_id
+
+
+def get_project_id_from_name(project_name, session):
+    from seeq import sdk
+
+    items_api = sdk.ItemsApi(session.client)
     response = items_api.search_items(
         filters=[f"name=={project_name}"], types=["Project"]
     )
     if len(response.items) == 0:
         raise Exception(f"Could not find a project with name {project_name}")
-    project_id = response.items[0].id
-    requests_session = _create_requests_session()
-    return requests_session, auth_header, project_id
+    return response.items[0].id
 
 
 def _create_requests_session():

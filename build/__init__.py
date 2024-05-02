@@ -17,5 +17,5 @@ from build.utils import (
     generate_schema_default_dict,
 )
 
-from build.session import get_authenticated_session
+from build.session import get_authenticated_session, get_project_id_from_name
 from build.utils import load_jsonnet
