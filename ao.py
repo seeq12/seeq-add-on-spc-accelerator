@@ -34,6 +34,7 @@ PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin"
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
 PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
+PATH_TO_PLAYWRIGHT = PATH_TO_SCRIPTS / "playwright"
 
 
 ELEMENT_ACTION_FILE = "element"
@@ -242,11 +243,11 @@ def bootstrap(args):
 
     sys.path.append(str(site_packages_path))
     # install playwright -- needed for e2e tests
-    # subprocess.run(
-    #     f"playwright install",
-    #     shell=True,
-    #     check=True,
-    # )
+    subprocess.run(
+        f"{PATH_TO_PLAYWRIGHT} install",
+        shell=True,
+        check=True,
+    )
     # now go bootstrap the elements
     target_elements = filter_element_paths(
         get_element_paths(), get_folders_from_args(args)
