@@ -6,6 +6,6 @@ import pytest
 from typing import Dict, Any
 
 
-@pytest.mark.system
+@pytest.mark.unit
 def test_test():
     assert True

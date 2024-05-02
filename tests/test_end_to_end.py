@@ -9,7 +9,7 @@ from playwright.sync_api import expect, Page, APIRequestContext
 # To lookup a datalab project ID, parametrize the test
 # and specify the path for the element we want to grab the project ID for.
 # Specify the path from the root of the project
-@pytest.mark.system
+@pytest.mark.end_to_end
 @pytest.mark.parametrize("element_path", ["add-on-tool"])
 def test_add_on(
     api_request_context: APIRequestContext,
