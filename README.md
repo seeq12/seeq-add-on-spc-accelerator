@@ -5,7 +5,7 @@
 
 ### Requirements
 
-The following base requirements are needed to build and deploy Add-on Manager.
+The following base requirements are needed to build and deploy:
 
 * Python 3: https://www.python.org/downloads/
 * A running Seeq server with an admin credentials

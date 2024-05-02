@@ -28,10 +28,13 @@ BOOTSTRAP_JSON_FILE = PROJECT_PATH / ".bootstrap.json"
 
 WINDOWS_OS = os.name == "nt"
 BUILD_PATH = PROJECT_PATH / "build"
+E2E_TEST_PATH = PROJECT_PATH / "tests"
 VIRTUAL_ENVIRONMENT_PATH = BUILD_PATH / ".venv"
 PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin")
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
+PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
+
 
 ELEMENT_ACTION_FILE = "element"
 
@@ -468,6 +471,15 @@ def elements_test(args):
     for element_path in target_elements:
         print(f"testing element: {element_path}")
         get_module(element_path).test()
+    # run E2E test if dir arg isn't passed
+    if not get_folders_from_args(args):
+        print("testing end-to-end")
+        subprocess.run(
+            f"{PATH_TO_PYTEST}",
+            cwd=E2E_TEST_PATH,
+            check=True,
+            shell=True,
+        )
 
 
 def _parse_url_username_password(args):

@@ -9,8 +9,6 @@ from playwright.sync_api import Playwright, APIRequestContext
 from typing import Generator
 from build.session import get_project_id_from_name
 
-
-# TODO Remove this hack -- just pass in from ao.py
 here = os.path.dirname(__file__)
 sys.path.append(os.path.join(here, ".."))
 from ao import (
