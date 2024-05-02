@@ -244,7 +244,7 @@ def bootstrap(args):
     sys.path.append(str(site_packages_path))
     # install playwright -- needed for e2e tests
     subprocess.run(
-        f"{PATH_TO_PLAYWRIGHT} install",
+        f"{PATH_TO_PLAYWRIGHT} install --with-deps",
         shell=True,
         check=True,
     )
