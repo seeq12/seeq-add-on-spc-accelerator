@@ -27,7 +27,7 @@ PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
 PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
 
-EXCLUDED_FOLDERS = {".venv", ".wheels", "build", "dist", "seeq_add_on_manager.egg-info"}
+EXCLUDED_FOLDERS = {".venv", ".wheels", "build", "dist", "seeq_add_on_manager.egg-info", "tests"}
 EXCLUDED_FILES = {"element.py", "build_api.py", "requirements.dev.txt"}
 FILE_EXTENSIONS = {".py", ".txt", ".ipynb", ".json"}
 
