@@ -272,10 +272,10 @@ def create_mean_formula_string(
         # iterate through each unique property value to add to the average formula
         for prop in unique_properties:
             if isinstance(prop, str) and prop and prop[0].isalpha():
-                property_text = re.sub(r'\W+', '', prop)
+                property_text = re.sub(r"\W+", "", prop)
                 prop_match = "'" + prop + "'"
             else:
-                property_text = "a" + re.sub(r'\W+', '', str(prop))
+                property_text = "a" + re.sub(r"\W+", "", str(prop))
                 prop_match = prop
             in_control_string += f"${property_text} = $applytocondition.keep('{capsule_property.v_model}', isMatch({prop_match})).intersect($inputcondition)\n"
             unweighted_average_string += f"${property_text}_average = $inputsignal.remove(not ${property_text}).toDiscrete().average($capsule)\n"
