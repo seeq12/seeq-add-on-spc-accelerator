@@ -35,7 +35,7 @@ jobs:
         ./ao bootstrap --url "$url" --username "$username" --password "$password"
     - name: Deploy Add-on to Seeq Instance
       run: |
-          ./ao --suffix="$PR_NUMBER" deploy --clean
+          ./ao deploy --clean
     - name: Test Add-on
       run: |
         ./ao test

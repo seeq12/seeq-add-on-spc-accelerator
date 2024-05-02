@@ -44,7 +44,7 @@ jobs:
           ./ao --suffix="$PR_NUMBER" deploy --clean
     - name: Test Add-on
       run: |
-        ./ao test
+        ./ao --suffix="$PR_NUMBER" test
     - name: Publish Add-on to Dev Repo
       run: |
           ./ao --suffix="$PR_NUMBER" publish 

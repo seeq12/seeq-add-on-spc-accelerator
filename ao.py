@@ -484,7 +484,7 @@ def elements_test(args):
     if not get_folders_from_args(args):
         print("testing end-to-end")
         subprocess.run(
-            f"{PATH_TO_PYTEST}",
+            f"{PATH_TO_PYTEST} -v -s",
             cwd=E2E_TEST_PATH,
             check=True,
             shell=True,
