@@ -239,6 +239,12 @@ def bootstrap(args):
             / f"python{sys.version_info.major}.{sys.version_info.minor}"
             / "site-packages"
         )
+    # install playwright -- needed for e2e tests
+    subprocess.run(
+        f"playwright install",
+        shell=True,
+        check=True,
+    )
     sys.path.append(str(site_packages_path))
     target_elements = filter_element_paths(
         get_element_paths(), get_folders_from_args(args)
