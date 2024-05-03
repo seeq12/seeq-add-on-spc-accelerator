@@ -28,6 +28,11 @@ def save_json(path: pathlib.Path, values: dict) -> None:
         json.dump(values, json_file, indent=2, ensure_ascii=False)
 
 
+def get_non_none_attr(obj, attr, default):
+    value = getattr(obj, attr, default)
+    return value if value is not None else default
+
+
 def topological_sort(graph: Dict[str, List[str]]) -> List[str]:
     """
     Topological sort algorithm.

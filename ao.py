@@ -18,6 +18,7 @@ from build import (
     topological_sort,
     ElementProtocol,
     generate_schema_default_dict,
+    get_non_none_attr
 )
 
 PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
@@ -78,7 +79,10 @@ def get_add_on_json() -> Optional[dict]:
 
 
 def get_bootstrap_json() -> Optional[dict]:
-    return load_json(BOOTSTRAP_JSON_FILE)
+    bootstrap_json = load_json(BOOTSTRAP_JSON_FILE)
+    if bootstrap_json is None:
+        raise Exception("Please run the bootstrap command.")
+    return bootstrap_json
 
 
 def get_element_paths() -> List[str]:
@@ -502,14 +506,11 @@ def _parse_url_username_password(args=None):
         bootstrap_json = get_bootstrap_json()
         if bootstrap_json is None:
             raise Exception("Please run the bootstrap command.")
-    url = args.url if hasattr(args, "url") else bootstrap_json.get("url")
-    username = (
-        args.username if hasattr(args, "username") else bootstrap_json.get("username")
-    )
-    password = (
-        args.password if hasattr(args, "password") else bootstrap_json.get("password")
-    )
-    print(url)
+
+    url = get_non_none_attr(args, 'url', bootstrap_json.get('url'))
+    username = get_non_none_attr(args, 'username', bootstrap_json.get('username'))
+    password = get_non_none_attr(args, 'password', bootstrap_json.get('password'))
+
     return url, username, password
 
 
