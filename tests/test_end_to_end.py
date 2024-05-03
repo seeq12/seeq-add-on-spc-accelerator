@@ -3,6 +3,7 @@ import re
 from seeq import spy
 from urllib.parse import urlencode
 import datetime
+import pytz
 from playwright.sync_api import expect, Page, APIRequestContext
 
 
@@ -15,7 +16,6 @@ def test_add_on(
     api_request_context: APIRequestContext,
     page: Page,
     url: str,
-    spy_session,
     project_id,
     element_config,
     element_identifier,
@@ -39,7 +39,7 @@ def test_add_on(
     workbench_page = browser_context.new_page()
     workbench_query_params = {
         "trendItems": "Example>>Cooling Tower 1>>Area B>>Temperature",
-        "workbookName": f"{element_identifier} {datetime.datetime.now().isoformat()}",
+        "workbookName": f"{element_identifier} {datetime.datetime.now(pytz.utc).isoformat()}",
     }
     workbook_builder_url = (
         f"{url}/workbook/builder/?{urlencode(workbench_query_params)}"
@@ -76,6 +76,6 @@ def test_add_on(
         "link"
     ).click()
 
-    workbook = spy.workbooks.pull(workbook_id, session=spy_session)[0]
+    workbook = spy.workbooks.pull(workbook_id)[0]
     worksheets = {ws.name for ws in workbook.worksheets}
     assert expected_worksheets.issubset(worksheets)

@@ -491,15 +491,15 @@ def elements_test(args):
         )
 
 
-def _parse_url_username_password(args):
+def _parse_url_username_password(args=None):
     bootstrap_json = None
-    if args.username is None or args.password is None or args.url is None:
+    if args is None or args.username is None or args.password is None or args.url is None:
         bootstrap_json = get_bootstrap_json()
         if bootstrap_json is None:
             raise Exception("Please run the bootstrap command.")
-    url = args.url if args.url else bootstrap_json.get("url")
-    username = args.username if args.username else bootstrap_json.get("username")
-    password = args.password if args.password else bootstrap_json.get("password")
+    url = getattr(args, 'url', bootstrap_json.get("url")) 
+    username = getattr(args, 'username', bootstrap_json.get("username")) 
+    password = getattr(args, 'password', bootstrap_json.get("password")) 
     return url, username, password
 
 

@@ -5,33 +5,16 @@ import json
 import time
 import types
 from seeq import spy
-from playwright.sync_api import Playwright, APIRequestContext
-from typing import Generator
 from build.session import get_project_id_from_name
 
-here = os.path.dirname(__file__)
-sys.path.append(os.path.join(here, ".."))
 from ao import (
     PROJECT_PATH,
-    get_bootstrap_json,
+    _parse_url_username_password,
     get_element_identifier_from_path,
     get_element_config_from_identifier,
 )
 
-bootstrap_json = get_bootstrap_json()
-_url = bootstrap_json.get("url")
-username = bootstrap_json.get("username")
-password = bootstrap_json.get("password")
-
-
-@pytest.fixture(scope="session")
-def spy_session():
-    session = spy.Session()
-    session.options.allow_version_mismatch = True
-    spy.login(
-        username=username, password=password, url=_url, quiet=True, session=session
-    )
-    return session
+_url, username, password = _parse_url_username_password()
 
 
 @pytest.fixture(scope="session")
@@ -45,8 +28,8 @@ def element_identifier(element_path):
 
 
 @pytest.fixture
-def project_id(element_identifier, spy_session):
-    return get_project_id_from_name(element_identifier, spy_session)
+def project_id(element_identifier):
+    return get_project_id_from_name(element_identifier, spy.session)
 
 
 @pytest.fixture
@@ -56,12 +39,12 @@ def element_config(element_identifier):
 
 @pytest.fixture(scope="session")
 def api_request_context(
-    url: str, playwright: Playwright, spy_session
-) -> Generator[APIRequestContext, None, None]:
+    url: str, playwright, login_spy # call login_spy fixture to ensure execution order
+):
     headers = {
         "Accept": "application/vnd.seeq.v1+json",
         "Content-Type": "application/vnd.seeq.v1+json",
-        "sq-auth": spy_session.client.auth_token,
+        "sq-auth": spy.client.auth_token,
     }
     request_context = playwright.request.new_context(
         base_url=url, extra_http_headers=headers
@@ -71,9 +54,18 @@ def api_request_context(
 
 
 @pytest.fixture(scope="session", autouse=True)
-def login(
-    api_request_context: APIRequestContext,
-    playwright: Playwright,
+def login_spy():
+    spy.login(
+        username=username, password=password, url=_url, quiet=True
+    )
+    assert spy.client.auth_token
+    spy.session.options.allow_version_mismatch = True
+
+
+@pytest.fixture(scope="session", autouse=True)
+def login_playwright(
+    api_request_context,
+    playwright,
 ):
     login_response = api_request_context.post(
         "/api/auth/login",
