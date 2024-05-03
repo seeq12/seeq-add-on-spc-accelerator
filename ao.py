@@ -18,6 +18,7 @@ from build import (
     topological_sort,
     ElementProtocol,
     generate_schema_default_dict,
+    get_non_none_attr,
 )
 
 PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
@@ -28,10 +29,14 @@ BOOTSTRAP_JSON_FILE = PROJECT_PATH / ".bootstrap.json"
 
 WINDOWS_OS = os.name == "nt"
 BUILD_PATH = PROJECT_PATH / "build"
+E2E_TEST_PATH = PROJECT_PATH / "tests"
 VIRTUAL_ENVIRONMENT_PATH = BUILD_PATH / ".venv"
 PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin")
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
+PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
+PATH_TO_PLAYWRIGHT = PATH_TO_SCRIPTS / "playwright"
+
 
 ELEMENT_ACTION_FILE = "element"
 
@@ -74,7 +79,10 @@ def get_add_on_json() -> Optional[dict]:
 
 
 def get_bootstrap_json() -> Optional[dict]:
-    return load_json(BOOTSTRAP_JSON_FILE)
+    bootstrap_json = load_json(BOOTSTRAP_JSON_FILE)
+    if bootstrap_json is None:
+        raise Exception("Please run the bootstrap command.")
+    return bootstrap_json
 
 
 def get_element_paths() -> List[str]:
@@ -169,6 +177,16 @@ def get_element_identifier_from_path(element_path: pathlib.Path) -> str:
     )
 
 
+def get_element_config_from_identifier(element_identifier: str):
+    add_on_json = get_add_on_json()
+    elements = add_on_json[ELEMENTS]
+    return next(
+        element
+        for element in elements
+        if element[ELEMENT_IDENTIFIER] == element_identifier
+    )
+
+
 def filter_element_paths(
     element_paths: Optional[List[str]], subset_folders: Optional[List[str]]
 ):
@@ -226,7 +244,15 @@ def bootstrap(args):
             / f"python{sys.version_info.major}.{sys.version_info.minor}"
             / "site-packages"
         )
+
     sys.path.append(str(site_packages_path))
+    # install playwright -- needed for e2e tests
+    subprocess.run(
+        f"{PATH_TO_PLAYWRIGHT} install --with-deps",
+        shell=True,
+        check=True,
+    )
+    # now go bootstrap the elements
     target_elements = filter_element_paths(
         get_element_paths(), get_folders_from_args(args)
     )
@@ -458,17 +484,33 @@ def elements_test(args):
     for element_path in target_elements:
         print(f"testing element: {element_path}")
         get_module(element_path).test()
+    # run E2E test if dir arg isn't passed
+    if not get_folders_from_args(args):
+        print("testing end-to-end")
+        subprocess.run(
+            f"{PATH_TO_PYTEST} -v -s",
+            cwd=E2E_TEST_PATH,
+            check=True,
+            shell=True,
+        )
 
 
-def _parse_url_username_password(args):
+def _parse_url_username_password(args=None):
     bootstrap_json = None
-    if args.username is None or args.password is None or args.url is None:
+    if (
+        args is None
+        or args.username is None
+        or args.password is None
+        or args.url is None
+    ):
         bootstrap_json = get_bootstrap_json()
         if bootstrap_json is None:
             raise Exception("Please run the bootstrap command.")
-    url = args.url if args.url else bootstrap_json.get("url")
-    username = args.username if args.username else bootstrap_json.get("username")
-    password = args.password if args.password else bootstrap_json.get("password")
+
+    url = get_non_none_attr(args, "url", bootstrap_json.get("url"))
+    username = get_non_none_attr(args, "username", bootstrap_json.get("username"))
+    password = get_non_none_attr(args, "password", bootstrap_json.get("password"))
+
     return url, username, password
 
 
@@ -483,7 +525,7 @@ if __name__ == "__main__":
     )
     parser_bootstrap.add_argument("--username", type=str, required=True)
     parser_bootstrap.add_argument("--password", type=str, required=True)
-    parser_bootstrap.add_argument("--url", type=str, default="http://localhost:34216")
+    parser_bootstrap.add_argument("--url", type=str, required=True)
     parser_bootstrap.add_argument(
         "--clean", action="store_true", default=False, help="Clean bootstrap"
     )

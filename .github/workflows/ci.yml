@@ -39,12 +39,12 @@ jobs:
     - name: Bootstrap Add-on
       run: |
         ./ao bootstrap --url "$url" --username "$username" --password "$password"
-    - name: Test Add-on
-      run: |
-        ./ao test
     - name: Deploy Add-on to Seeq Instance
       run: |
           ./ao --suffix="$PR_NUMBER" deploy --clean
+    - name: Test Add-on
+      run: |
+        ./ao --suffix="$PR_NUMBER" test
     - name: Publish Add-on to Dev Repo
       run: |
           ./ao --suffix="$PR_NUMBER" publish 
@@ -71,12 +71,12 @@ jobs:
     - name: Bootstrap Add-on
       run: |
         ./ao bootstrap --url "$url" --username "$username" --password "$password"
-    - name: Test Add-on
-      run: |
-        ./ao test
     - name: Deploy Add-on to Seeq Instance
       run: |
           ./ao deploy --clean
+    - name: Test Add-on
+      run: |
+        ./ao test
   
   publishProd:
     name: Publish | Production
