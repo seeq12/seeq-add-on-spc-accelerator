@@ -502,9 +502,9 @@ def _parse_url_username_password(args=None):
         bootstrap_json = get_bootstrap_json()
         if bootstrap_json is None:
             raise Exception("Please run the bootstrap command.")
-    url = getattr(args, "url", bootstrap_json.get("url"))
-    username = getattr(args, "username", bootstrap_json.get("username"))
-    password = getattr(args, "password", bootstrap_json.get("password"))
+    url = args.url if hasattr(args, 'url') else bootstrap_json.get("url")
+    username = args.username if hasattr(args, 'username') else bootstrap_json.get("username")
+    password = args.password if hasattr(args, 'password') else bootstrap_json.get("password")
     return url, username, password
 
 

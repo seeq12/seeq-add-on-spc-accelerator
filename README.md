@@ -19,7 +19,6 @@ Execute the following command in a Bash (or Bash-like) terminal to setup your en
 bash ao bootstrap --url http://your.running.seeq.server --username your.username@seeq.com --password your.password [--python custom_python]
 ```
 The `username` and `password` are the credentials of an admin user on your Seeq server. The `url` is the url of your Seeq server.
-The `url` is an optional argument. If not provided, the url defaults to http://localhost:34216.
 The optional `python` argument is a place to provide an alternative python to use for bootstrapping if `python` is not on your path
 
 The bootstrap step only needs to be done once. It will create a `.bootstrap.json` file in the parent of the repo.
