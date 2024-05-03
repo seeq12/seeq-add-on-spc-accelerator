@@ -509,6 +509,7 @@ def _parse_url_username_password(args=None):
     password = (
         args.password if hasattr(args, "password") else bootstrap_json.get("password")
     )
+    print(url)
     return url, username, password
 
 
