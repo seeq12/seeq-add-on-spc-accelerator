@@ -519,7 +519,7 @@ if __name__ == "__main__":
     )
     parser_bootstrap.add_argument("--username", type=str, required=True)
     parser_bootstrap.add_argument("--password", type=str, required=True)
-    parser_bootstrap.add_argument("--url", type=str, default="http://localhost:34216")
+    parser_bootstrap.add_argument("--url", type=str, required=True)
     parser_bootstrap.add_argument(
         "--clean", action="store_true", default=False, help="Clean bootstrap"
     )
