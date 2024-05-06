@@ -1,7 +1,7 @@
 seeq
 seeq-spy
 wheel
-jsonnet
+jsonnet-binary
 dohq-artifactory
 pytest-playwright
 playwright

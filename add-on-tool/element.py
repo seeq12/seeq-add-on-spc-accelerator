@@ -10,6 +10,8 @@ import venv
 from datetime import datetime
 from os.path import isdir, relpath
 from typing import List
+import pytest
+
 
 # TODO Remove this hack
 here = os.path.dirname(__file__)
@@ -86,7 +88,10 @@ def watch(url: str, username: str, password: str) -> subprocess.Popen:
 
 
 def test() -> None:
-    subprocess.run(f"{PATH_TO_PYTEST}", cwd=ELEMENT_PATH, check=True, shell=True)
+    # Change directory to the element path
+    os.chdir(ELEMENT_PATH)
+    # Run pytest with the specified arguments
+    pytest.main(["-v"])
 
 
 async def _watch_from_environment(url: str, username: str, password: str):
