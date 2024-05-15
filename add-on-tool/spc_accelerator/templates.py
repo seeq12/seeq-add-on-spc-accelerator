@@ -1,6 +1,6 @@
 from seeq import spy, sdk
-from spc_accelerator.backend import *
 import json
+import pandas as pd
 
 
 def create_template(
