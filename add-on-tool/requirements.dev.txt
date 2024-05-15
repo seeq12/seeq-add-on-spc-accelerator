@@ -1,7 +1,10 @@
 seeq
 seeq-spy
 wheel
-jsonnet-binary 
+jsonnet; platform_system != "Windows"
+jsonnet-binary; platform_system == "Windows"
+pytest-playwright
+playwright
 pytest==7.4.2
 mock==5.1.0
 pycodestyle==2.10.0

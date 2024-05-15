@@ -35,7 +35,6 @@ PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin"
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
 PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
-PATH_TO_PLAYWRIGHT = PATH_TO_SCRIPTS / "playwright"
 
 
 ELEMENT_ACTION_FILE = "element"
@@ -246,12 +245,7 @@ def bootstrap(args):
         )
 
     sys.path.append(str(site_packages_path))
-    # install playwright -- needed for e2e tests
-    subprocess.run(
-        f"{PATH_TO_PLAYWRIGHT} install --with-deps",
-        shell=True,
-        check=True,
-    )
+
     # now go bootstrap the elements
     target_elements = filter_element_paths(
         get_element_paths(), get_folders_from_args(args)
@@ -484,15 +478,6 @@ def elements_test(args):
     for element_path in target_elements:
         print(f"testing element: {element_path}")
         get_module(element_path).test()
-    # run E2E test if dir arg isn't passed
-    if not get_folders_from_args(args):
-        print("testing end-to-end")
-        subprocess.run(
-            f"{PATH_TO_PYTEST} -v -s",
-            cwd=E2E_TEST_PATH,
-            check=True,
-            shell=True,
-        )
 
 
 def _parse_url_username_password(args=None):

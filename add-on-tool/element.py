@@ -10,13 +10,12 @@ import venv
 from datetime import datetime
 from os.path import isdir, relpath
 from typing import List
-import pytest
-
 
 # TODO Remove this hack
 here = os.path.dirname(__file__)
 sys.path.append(os.path.join(here, ".."))
 from ao import get_element_identifier_from_path
+
 
 CURRENT_FILE = pathlib.Path(__file__)
 ELEMENT_PATH = CURRENT_FILE.parent.resolve()
@@ -28,6 +27,7 @@ PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin"
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
 PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
+PATH_TO_PLAYWRIGHT = PATH_TO_SCRIPTS / "playwright"
 
 EXCLUDED_FOLDERS = {
     ".venv",
@@ -88,10 +88,7 @@ def watch(url: str, username: str, password: str) -> subprocess.Popen:
 
 
 def test() -> None:
-    # Change directory to the element path
-    os.chdir(ELEMENT_PATH)
-    # Run pytest with the specified arguments
-    pytest.main(["-v"])
+    subprocess.run(f"{PATH_TO_PYTEST}", cwd=ELEMENT_PATH, check=True, shell=True)
 
 
 async def _watch_from_environment(url: str, username: str, password: str):
@@ -268,6 +265,13 @@ def _create_virtual_environment(clean: bool = False):
         f"{PATH_TO_PIP} install -r {ELEMENT_PATH / 'requirements.dev.txt'}"
         f" -r {ELEMENT_PATH / 'requirements.txt'}"
         f" -f {WHEELS_PATH}",
+        shell=True,
+        check=True,
+    )
+    print("Installing Playwright browsers")
+    # install playwright -- needed for e2e tests
+    subprocess.run(
+        f"{PATH_TO_PLAYWRIGHT} install --with-deps",
         shell=True,
         check=True,
     )

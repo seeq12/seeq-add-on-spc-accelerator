@@ -13,13 +13,12 @@ from datetime import datetime
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from _app import SPCAccelerator
+from .._app import SPCAccelerator
 
 WORKBOOK = "SPC Addon Unit Testing"
 
-@pytest.fixture(scope='module')
+
+@pytest.fixture(scope="module")
 def spc_accelerator_testing(request):
     def test_system():
         # Check if the asset tree 'SPC Addon' already exists in the 'SPC Addon Unit Testing' workbook
@@ -66,7 +65,11 @@ def spc_accelerator_testing(request):
         if workbook is not None:
             # Find the worksheet that matches the end_time
             matching_worksheet = next(
-                (ws for ws in workbook.worksheets if f"Test - {time_now_str}" in ws.name),
+                (
+                    ws
+                    for ws in workbook.worksheets
+                    if f"Test - {time_now_str}" in ws.name
+                ),
                 None,
             )
             matching_worksheet.display_range = {"Start": start_time, "End": end_time}
@@ -81,7 +84,9 @@ def spc_accelerator_testing(request):
         worksheet_guid = push_url.split("/worksheet/")[1].split("/")[0]
 
         # Replace the worksheet GUID in the url with the new worksheet ID
-        url = push_url.replace(f"/worksheet/{worksheet_guid}", f"/worksheet/{worksheet_id}")
+        url = push_url.replace(
+            f"/worksheet/{worksheet_guid}", f"/worksheet/{worksheet_id}"
+        )
 
         # Get the ID of the matching worksheet
         matching_worksheet_id = (
@@ -139,12 +144,12 @@ def spc_accelerator_testing(request):
         # Push the asset tree to Seeq
         addon_tree.push(quiet=True)
 
-
     url, workbook_id, worksheet_id = test_system()
 
     return url, workbook_id, worksheet_id
 
 
+@pytest.mark.system
 def test_spc_accelerator_object_created_successfully(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -178,6 +183,7 @@ def test_spc_accelerator_object_created_successfully(spc_accelerator_testing):
 
 
 # Test for input_signal required and training windows is setup correctly
+@pytest.mark.system
 def test_missing_input_signal_training_window(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     # Initialize the class object
@@ -194,7 +200,9 @@ def test_missing_input_signal_training_window(spc_accelerator_testing):
     assert spc_accelerator.error.value == False
 
 
+@pytest.mark.system
 def test_create_control_chart_signal_only(spc_accelerator_testing):
+    print(spy.client)
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
@@ -209,6 +217,7 @@ def test_create_control_chart_signal_only(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_signal_condition(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -226,6 +235,7 @@ def test_create_control_chart_signal_condition(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_signal_condition(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -243,6 +253,7 @@ def test_create_control_chart_signal_condition(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_we_runrules(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -261,6 +272,7 @@ def test_create_control_chart_we_runrules(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_nelson_runrules(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -279,6 +291,7 @@ def test_create_control_chart_nelson_runrules(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_histogram(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -297,6 +310,7 @@ def test_create_control_chart_histogram(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_capsule_prop(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
@@ -315,6 +329,7 @@ def test_create_control_chart_capsule_prop(spc_accelerator_testing):
     assert spc_accelerator.workbook_button.disabled == False
 
 
+@pytest.mark.system
 def test_create_control_chart_apply_condition(spc_accelerator_testing):
     url, workbook_id, worksheet_id = spc_accelerator_testing
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
