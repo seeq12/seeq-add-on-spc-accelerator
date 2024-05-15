@@ -37,7 +37,7 @@ EXCLUDED_FOLDERS = {
     "seeq_add_on_manager.egg-info",
     "tests",
 }
-EXCLUDED_FILES = {"element.py", "build_api.py", "requirements.dev.txt"}
+EXCLUDED_FILES = {"element.py", "requirements.dev.txt"}
 FILE_EXTENSIONS = {".py", ".txt", ".ipynb", ".json"}
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S%z"

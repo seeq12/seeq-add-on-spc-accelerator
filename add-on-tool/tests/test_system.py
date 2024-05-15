@@ -13,7 +13,7 @@ from datetime import datetime
 import sys
 import os
 
-from .._app import SPCAccelerator
+from spc_accelerator import SPCAccelerator
 
 WORKBOOK = "SPC Addon Unit Testing"
 

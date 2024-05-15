@@ -1,5 +1,5 @@
 from seeq import spy, sdk
-from _backend import *
+from spc_accelerator.backend import *
 import json
 
 
