@@ -1,8 +1,17 @@
+
+<div align="center">
+
+[User Guide](https://seeq12.github.io/seeq-add-on-spc-accelerator/user_guide.html) • [Getting Help](https://seeq12.github.io/seeq-add-on-spc-accelerator/getting_help.html)
+
 # Seeq SPC Accelerator
 ![Deploy & Test](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/ci.yml/badge.svg)
 ![Nightly Tests](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/nightly.yml/badge.svg)
 
-<img src="docs/source/_static/preview.png" alt="preview" height="400"/>
+<img src="docs/source/_static/preview.png" alt="preview" height="750"/>
+
+The SPC Accelerator add-on allows you to create Statistical Process Control (SPC) control charts and apply run rules to signals in Seeq.
+
+</div>
 
 ## Development
 
