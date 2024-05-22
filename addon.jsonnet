@@ -8,7 +8,7 @@ function(suffix='')
     identifier: add_on_identifier + hyphen_suffix,
     name: add_on_name + name_suffix,
     artifactory_dir: std.asciiLower((std.strReplace(add_on_name, ' ', '_') + underscore_suffix)),  // used when deploying to artifactory
-    description: 'DESCRIPTION HERE',  // this will show on the add-on manager
+    description: 'Create Statistical Process Control (SPC) control charts and apply run rules',  // this will show on the add-on manager
     version: '0.1.0',
     license: 'Apache 2.0',
     icon: 'fa fa-wrench',

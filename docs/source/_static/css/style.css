@@ -9,12 +9,10 @@
 @import '../nature.css';
 /* for Alabaster */
 
-.wy-side-nav-search {
+.wy-side-nav-search,
+.wy-nav-side,
+.wy-nav-top {
     background-color: #081F2C;
-}
-
-.wy-nav-side {
-    background: #081F2C;
 }
 
 .wy-side-nav-search img.logo {
