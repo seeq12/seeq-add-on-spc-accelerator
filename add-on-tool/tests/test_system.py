@@ -146,16 +146,17 @@ def spc_accelerator_testing(request):
         # Push the asset tree to Seeq
         addon_tree.push(quiet=True)
 
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     test_names = [
-        "test_spc_accelerator_object_created_successfully",
-        "test_missing_input_signal_training_window",
-        "test_create_control_chart_signal_only",
-        "test_create_control_chart_signal_condition",
-        "test_create_control_chart_we_runrules",
-        "test_create_control_chart_nelson_runrules",
-        "test_create_control_chart_histogram",
-        "test_create_control_chart_capsule_prop",
-        "test_create_control_chart_apply_condition",
+        f"test_spc_accelerator_object_created_successfully {timestamp}",
+        f"test_missing_input_signal_training_window {timestamp}",
+        f"test_create_control_chart_signal_only {timestamp}",
+        f"test_create_control_chart_signal_condition {timestamp}",
+        f"test_create_control_chart_we_runrules {timestamp}",
+        f"test_create_control_chart_nelson_runrules {timestamp}",
+        f"test_create_control_chart_histogram {timestamp}",
+        f"test_create_control_chart_capsule_prop {timestamp}",
+        f"test_create_control_chart_apply_condition {timestamp}",
     ]
 
     test_workbooks = {}
