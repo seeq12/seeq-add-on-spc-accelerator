@@ -1,9 +1,11 @@
 
 <div align="center">
 
+# Seeq SPC Accelerator
+
+
 [User Guide](https://seeq12.github.io/seeq-add-on-spc-accelerator/user_guide.html) • [Getting Help](https://seeq12.github.io/seeq-add-on-spc-accelerator/getting_help.html)
 
-# Seeq SPC Accelerator
 ![Deploy & Test](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/ci.yml/badge.svg)
 ![Nightly Tests](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/nightly.yml/badge.svg)
 
