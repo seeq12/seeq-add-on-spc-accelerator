@@ -2,6 +2,8 @@
 ![Deploy & Test](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/ci.yml/badge.svg)
 ![Nightly Tests](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/nightly.yml/badge.svg)
 
+<img src="docs/source/_static/preview.png" alt="preview", height="250"/>
+
 ## Development
 
 ### Requirements
