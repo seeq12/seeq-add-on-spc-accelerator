@@ -8,7 +8,7 @@ function(suffix='')
     identifier: add_on_identifier + hyphen_suffix,
     name: add_on_name + name_suffix,
     artifactory_dir: std.asciiLower((std.strReplace(add_on_name, ' ', '_') + underscore_suffix)),  // used when deploying to artifactory
-    description: 'Create Statistical Process Control (SPC) control charts and apply run rules',  // this will show on the add-on manager
+    description: 'Create Statistical Process Control (SPC) control charts and apply run rules <a href="www.google.com">test</a>',  // this will show on the add-on manager
     version: '0.1.0',
     license: 'Apache 2.0',
     icon: 'fa fa-wrench',
@@ -19,7 +19,7 @@ function(suffix='')
     elements: [
       {
         name: $.name,  // the UI name should match the overall add-on name
-        description: $.description,
+        description: 'Create Statistical Process Control (SPC) control charts and apply run rules',
         local element_identifier = 'ui',  // identifier for the element, needs to be unique amonst the elements
         identifier: add_on_identifier + '.' + element_identifier + hyphen_suffix,
         type: 'AddOnTool',
