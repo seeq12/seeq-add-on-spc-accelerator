@@ -1,10 +1,9 @@
 seeq
 seeq-spy
 wheel
-jsonnet
+jsonnet; platform_system != "Windows"
+jsonnet-binary; platform_system == "Windows"
 dohq-artifactory
-pytest-playwright
-playwright
 pytest==7.4.2
 mock==5.1.0
 pycodestyle==2.10.0

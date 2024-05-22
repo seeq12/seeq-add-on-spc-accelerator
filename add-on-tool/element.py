@@ -16,6 +16,7 @@ here = os.path.dirname(__file__)
 sys.path.append(os.path.join(here, ".."))
 from ao import get_element_identifier_from_path
 
+
 CURRENT_FILE = pathlib.Path(__file__)
 ELEMENT_PATH = CURRENT_FILE.parent.resolve()
 VIRTUAL_ENVIRONMENT_PATH = ELEMENT_PATH / ".venv"
@@ -26,6 +27,7 @@ PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin"
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
 PATH_TO_PYTEST = PATH_TO_SCRIPTS / "pytest"
+PATH_TO_PLAYWRIGHT = PATH_TO_SCRIPTS / "playwright"
 
 EXCLUDED_FOLDERS = {
     ".venv",
@@ -35,7 +37,7 @@ EXCLUDED_FOLDERS = {
     "seeq_add_on_manager.egg-info",
     "tests",
 }
-EXCLUDED_FILES = {"element.py", "build_api.py", "requirements.dev.txt"}
+EXCLUDED_FILES = {"element.py", "requirements.dev.txt"}
 FILE_EXTENSIONS = {".py", ".txt", ".ipynb", ".json"}
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
@@ -263,6 +265,13 @@ def _create_virtual_environment(clean: bool = False):
         f"{PATH_TO_PIP} install -r {ELEMENT_PATH / 'requirements.dev.txt'}"
         f" -r {ELEMENT_PATH / 'requirements.txt'}"
         f" -f {WHEELS_PATH}",
+        shell=True,
+        check=True,
+    )
+    print("Installing Playwright browsers")
+    # install playwright -- needed for e2e tests
+    subprocess.run(
+        f"{PATH_TO_PLAYWRIGHT} install --with-deps",
         shell=True,
         check=True,
     )

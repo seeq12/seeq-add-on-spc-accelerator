@@ -1,8 +1,6 @@
 from seeq import spy, sdk
-from _backend import *
 import json
-
-workbooks_api = sdk.WorkbooksApi(spy.client)
+import pandas as pd
 
 
 def create_template(
@@ -16,6 +14,7 @@ def create_template(
     workbook_id,
     histogram_dict,
 ):
+    workbooks_api = sdk.WorkbooksApi(spy.client)
     wb = spy.workbooks.pull(URL, quiet=True)
     ws = wb[0].worksheets
     new_worksheet_ids = []

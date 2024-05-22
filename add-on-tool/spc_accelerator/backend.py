@@ -4,8 +4,7 @@ import pandas as pd
 import json
 import re
 import math
-import os
-from _templates import create_template, format_histogram_worksheet
+from spc_accelerator.templates import create_template, format_histogram_worksheet
 
 # when deploying a test instance, need to append a suffix to the formula package names to prevent collisons
 try:

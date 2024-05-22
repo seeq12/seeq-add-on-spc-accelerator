@@ -38,13 +38,11 @@ def element_config(element_identifier):
 
 
 @pytest.fixture(scope="session")
-def api_request_context(
-    url: str, playwright, login_spy # call login_spy fixture to ensure execution order
-):
+def api_request_context(url: str, playwright):
     headers = {
         "Accept": "application/vnd.seeq.v1+json",
         "Content-Type": "application/vnd.seeq.v1+json",
-        "sq-auth": spy.client.auth_token,
+        # "sq-auth": spy.client.auth_token,
     }
     request_context = playwright.request.new_context(
         base_url=url, extra_http_headers=headers
@@ -55,9 +53,7 @@ def api_request_context(
 
 @pytest.fixture(scope="session", autouse=True)
 def login_spy():
-    spy.login(
-        username=username, password=password, url=_url, quiet=True
-    )
+    spy.login(username=username, password=password, url=_url, quiet=True)
     assert spy.client.auth_token
     spy.session.options.allow_version_mismatch = True
 
