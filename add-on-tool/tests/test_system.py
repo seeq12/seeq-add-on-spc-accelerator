@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
 import warnings
+import inspect
 
 warnings.filterwarnings("ignore")
 
@@ -15,31 +16,30 @@ import os
 
 from spc_accelerator import SPCAccelerator
 
-WORKBOOK = "SPC Addon Unit Testing"
-
-
 @pytest.fixture(scope="module")
 def spc_accelerator_testing(request):
-    def test_system():
-        # Check if the asset tree 'SPC Addon' already exists in the 'SPC Addon Unit Testing' workbook
+    def setup_workbook(workbook_name):
+        # Check if the asset tree 'SPC Addon' already exists in the workbook_name
         try:
             search_results = spy.search(
-                {"Path": "SPC Addon"}, workbook=WORKBOOK, quiet=True
+                {"Path": "SPC Addon"}, workbook=workbook_name, quiet=True
             )
+            # If workbook exists but the asset tree does not exist, create the asset tree
             if search_results["ID"].count() == 0:
-                create_tree()
+                create_tree(workbook_name)
+        # If the workbook does not exist, create workbook and the asset tree
         except Exception as e:
-            create_tree()
+            create_tree(workbook_name)
 
         # Search for the signal
         results = spy.search(
             {"Path": "SPC Addon", "Name": "*"},
-            workbook=WORKBOOK,
+            workbook=workbook_name,
             quiet=True,
             all_properties=True,
         )
 
-        # Define the display window for the last 24 hours
+        # Define the display window for the workbook
         time_now = datetime.now(timezone.utc)
         end_time = time_now - timedelta(hours=12)
         start_time = (end_time - timedelta(days=3)).strftime("%Y-%m-%d %H:%M")
@@ -49,17 +49,17 @@ def spc_accelerator_testing(request):
         # Push the metadata DataFrame to a new workbook
         push_results = spy.push(
             metadata=results,
-            workbook=WORKBOOK,
+            workbook=workbook_name,
             worksheet=f"Test - {time_now_str}",
             quiet=True,
         )
 
-        workbooks_df = spy.workbooks.search({"Name": WORKBOOK}, quiet=True)
+        workbooks_df = spy.workbooks.search({"Name": workbook_name}, quiet=True)
 
         wb = spy.workbooks.pull(workbooks_df, quiet=True)
 
-        # Find the workbook with the name 'SPC Addon Unit Testing'
-        workbook = next((w for w in wb if w.name == WORKBOOK), None)
+        # Find the workbook with the workbook_name 
+        workbook = next((w for w in wb if w.name == workbook_name), None)
 
         # Check if workbook is found
         if workbook is not None:
@@ -103,15 +103,15 @@ def spc_accelerator_testing(request):
 
         return url, workbook_id, worksheet_id
 
-    def create_tree():
-        # Search for the 'Temperature' signal
+    def create_tree(workbook_name):
+        # Search for the 'Temperature' signal in the Example asset tree
         search_results = spy.search(
             {"Path": "Example >> Cooling Tower 1 >> Area A", "Name": "Temperature"},
             quiet=True,
         )
 
         # Create a new asset tree called 'SPC Addon'
-        addon_tree = spy.assets.Tree("SPC Addon", workbook=WORKBOOK, quiet=True)
+        addon_tree = spy.assets.Tree("SPC Addon", workbook=workbook_name, quiet=True)
 
         # Insert a new asset called 'Asset A' into the tree
         addon_tree.insert(children="Asset A", quiet=True)
@@ -130,7 +130,7 @@ def spc_accelerator_testing(request):
             quiet=True,
         )
 
-        # Insert a new condition called 'Temperature > 90' into 'Asset A'
+        # Insert a new condition called 'Days' into 'Asset A'
         addon_tree.insert(
             name="Days",
             formula="""days()
@@ -144,14 +144,38 @@ def spc_accelerator_testing(request):
         # Push the asset tree to Seeq
         addon_tree.push(quiet=True)
 
-    url, workbook_id, worksheet_id = test_system()
+    test_names = [
+        "test_spc_accelerator_object_created_successfully",
+        "test_missing_input_signal_training_window",
+        "test_create_control_chart_signal_only",
+        "test_create_control_chart_signal_condition",
+        "test_create_control_chart_we_runrules",
+        "test_create_control_chart_nelson_runrules",
+        "test_create_control_chart_histogram",
+        "test_create_control_chart_capsule_prop",
+        "test_create_control_chart_apply_condition"
+    ]
 
-    return url, workbook_id, worksheet_id
+    test_workbooks = {}
+
+    for test in test_names:
+        url, workbook_id, worksheet_id = setup_workbook(workbook_name=test)
+        test_workbooks[test] = {
+            'url': url,
+            'workbook_id': workbook_id,
+            'worksheet_id': worksheet_id
+        }
+
+    return test_workbooks
 
 
 @pytest.mark.system
 def test_spc_accelerator_object_created_successfully(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     assert spc_accelerator.URL == url
@@ -185,8 +209,11 @@ def test_spc_accelerator_object_created_successfully(spc_accelerator_testing):
 # Test for input_signal required and training windows is setup correctly
 @pytest.mark.system
 def test_missing_input_signal_training_window(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
-    # Initialize the class object
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     # Set initial value of self.success.value to True
@@ -202,8 +229,11 @@ def test_missing_input_signal_training_window(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_signal_only(spc_accelerator_testing):
-    print(spy.client)
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -219,7 +249,11 @@ def test_create_control_chart_signal_only(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_signal_condition(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -237,7 +271,11 @@ def test_create_control_chart_signal_condition(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_signal_condition(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -255,7 +293,11 @@ def test_create_control_chart_signal_condition(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_we_runrules(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -274,7 +316,11 @@ def test_create_control_chart_we_runrules(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_nelson_runrules(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -293,7 +339,11 @@ def test_create_control_chart_nelson_runrules(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_histogram(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -312,7 +362,11 @@ def test_create_control_chart_histogram(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_capsule_prop(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
@@ -331,7 +385,11 @@ def test_create_control_chart_capsule_prop(spc_accelerator_testing):
 
 @pytest.mark.system
 def test_create_control_chart_apply_condition(spc_accelerator_testing):
-    url, workbook_id, worksheet_id = spc_accelerator_testing
+    test_workbooks = spc_accelerator_testing
+    current_test_name = inspect.currentframe().f_code.co_name
+    url = test_workbooks[current_test_name]["url"]
+    workbook_id = test_workbooks[current_test_name]["workbook_id"]
+    worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
