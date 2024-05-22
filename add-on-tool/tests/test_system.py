@@ -16,6 +16,8 @@ import os
 
 from spc_accelerator import SPCAccelerator
 
+
+# Define the fixture to setup the workbook and asset tree for testing
 @pytest.fixture(scope="module")
 def spc_accelerator_testing(request):
     def setup_workbook(workbook_name):
@@ -58,7 +60,7 @@ def spc_accelerator_testing(request):
 
         wb = spy.workbooks.pull(workbooks_df, quiet=True)
 
-        # Find the workbook with the workbook_name 
+        # Find the workbook with the workbook_name
         workbook = next((w for w in wb if w.name == workbook_name), None)
 
         # Check if workbook is found
@@ -153,7 +155,7 @@ def spc_accelerator_testing(request):
         "test_create_control_chart_nelson_runrules",
         "test_create_control_chart_histogram",
         "test_create_control_chart_capsule_prop",
-        "test_create_control_chart_apply_condition"
+        "test_create_control_chart_apply_condition",
     ]
 
     test_workbooks = {}
@@ -161,9 +163,9 @@ def spc_accelerator_testing(request):
     for test in test_names:
         url, workbook_id, worksheet_id = setup_workbook(workbook_name=test)
         test_workbooks[test] = {
-            'url': url,
-            'workbook_id': workbook_id,
-            'worksheet_id': worksheet_id
+            "url": url,
+            "workbook_id": workbook_id,
+            "worksheet_id": worksheet_id,
         }
 
     return test_workbooks
