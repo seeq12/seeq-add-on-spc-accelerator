@@ -8,7 +8,13 @@ function(suffix='')
     identifier: add_on_identifier + hyphen_suffix,
     name: add_on_name + name_suffix,
     artifactory_dir: std.asciiLower((std.strReplace(add_on_name, ' ', '_') + underscore_suffix)),  // used when deploying to artifactory
-    description: 'Create Statistical Process Control (SPC) control charts and apply run rules <a href="www.google.com">test</a>',  // this will show on the add-on manager
+    description: |||
+      Create Statistical Process Control (SPC) control charts and apply run rules
+
+      This Add-on is maintained by a member of the Seeq Analytics Engineering team. Feature requests and bugs are handled through GitHub, please submit these requests as issues in the corresponding GitHub repository
+
+      https://github.com/seeq12/seeq-add-on-spc-accelerator/issues
+    |||,
     version: '0.1.0',
     license: 'Apache 2.0',
     icon: 'fa fa-wrench',
