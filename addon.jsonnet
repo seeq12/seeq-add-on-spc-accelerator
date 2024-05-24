@@ -11,13 +11,13 @@ function(suffix='')
     description: |||
       Create Statistical Process Control (SPC) control charts and apply run rules
 
-      This Add-on is maintained by a member of the Seeq Analytics Engineering team. Feature requests and bugs are handled through GitHub, please submit these requests as issues in the corresponding GitHub repository
+      This Add-on is maintained by a member of the Seeq Analytics Engineering team. Feature requests and bugs are handled through GitHub, please submit these requests as issues in the corresponding GitHub repository:
 
       https://github.com/seeq12/seeq-add-on-spc-accelerator/issues
     |||,
     version: '0.1.0',
     license: 'Apache 2.0',
-    icon: 'fa fa-wrench',
+    icon: 'fa-bullseye',
     maintainer: 'Seeq Corporation',  // set to Seeq Corporation for AE developed add-ons
     previews: [
       'docs/source/_static/preview.png',
@@ -39,7 +39,7 @@ function(suffix='')
             display: {
               type: 'object',
               properties: {
-                icon: { type: 'string', default: 'fa fa-arrows-h' },
+                icon: { type: 'string', default: 'fa-bullseye' },
                 linkType: { enum: ['window', 'tab', 'none'], default: 'window' },
                 sortKey: { type: 'string', default: 'S' },
                 windowDetails: { type: 'string', default: 'toolbar=0,location=0,scrollbars=1,statusbar=0,menubar=0,resizable=1,height=925,width=425' },
