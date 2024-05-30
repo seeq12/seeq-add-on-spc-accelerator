@@ -11,26 +11,27 @@ import json
 from typing import Optional, List
 import venv
 
-
-from build import (
+from ao.utils import (
     load_json,
     save_json,
     topological_sort,
-    ElementProtocol,
-    generate_schema_default_dict,
     get_non_none_attr,
+    generate_schema_default_dict,
 )
+from ao.element import ElementProtocol
 
-PROJECT_PATH = pathlib.Path(__file__).parent.resolve()
+PROJECT_PATH = pathlib.Path(__file__).parent.parent.resolve()
 WHEELS_PATH = PROJECT_PATH / ".wheels"
 ADDON_JSON_FILE = PROJECT_PATH / "addon.json"
 ADDON_JSONNET_FILE = PROJECT_PATH / "addon.jsonnet"
 BOOTSTRAP_JSON_FILE = PROJECT_PATH / ".bootstrap.json"
+BUILD_REQUIREMENTS_FILE = pathlib.Path(__file__).parent / "requirements.dev.txt"
+
 
 WINDOWS_OS = os.name == "nt"
 BUILD_PATH = PROJECT_PATH / "build"
 E2E_TEST_PATH = PROJECT_PATH / "tests"
-VIRTUAL_ENVIRONMENT_PATH = BUILD_PATH / ".venv"
+VIRTUAL_ENVIRONMENT_PATH = PROJECT_PATH / ".venv"
 PATH_TO_SCRIPTS = VIRTUAL_ENVIRONMENT_PATH / ("Scripts" if WINDOWS_OS else "bin")
 PATH_TO_PIP = PATH_TO_SCRIPTS / "pip"
 PATH_TO_PYTHON = PATH_TO_SCRIPTS / "python"
@@ -66,7 +67,7 @@ def create_package_filename(dist_base_filename: str, version: str) -> str:
 
 
 def get_add_on_json() -> Optional[dict]:
-    from build import load_jsonnet
+    from ao.utils import load_jsonnet
 
     jsonnet_vars = {
         "suffix": get_add_on_suffix(),
@@ -274,8 +275,7 @@ def _create_virtual_environment(clean: bool = False):
         f"{PATH_TO_PYTHON} -m pip install --upgrade pip", shell=True, check=True
     )
     subprocess.run(
-        f"{PATH_TO_PIP} install -r {BUILD_PATH / 'requirements.dev.txt'}"
-        f" -f {WHEELS_PATH}",
+        f"{PATH_TO_PIP} install -r {BUILD_REQUIREMENTS_FILE}" f" -f {WHEELS_PATH}",
         shell=True,
         check=True,
     )
@@ -297,7 +297,7 @@ def build(args=None):
 
 
 def uninstall(args):
-    from build.add_on import AddOnManagerSession
+    from ao.session import AddOnManagerSession
 
     url, username, password = _parse_url_username_password(args)
     add_on_identifier = get_add_on_identifier()
@@ -321,7 +321,7 @@ def uninstall(args):
 
 def deploy(args):
     "Package and deploy the add-on to the server; assumes AoM is installed"
-    from build.add_on import AddOnManagerSession
+    from ao.session import AddOnManagerSession
 
     url, username, password = _parse_url_username_password(args)
     add_on_identifier = get_add_on_identifier()
@@ -497,116 +497,3 @@ def _parse_url_username_password(args=None):
     password = get_non_none_attr(args, "password", bootstrap_json.get("password"))
 
     return url, username, password
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="ao.py", description="Add-on Manager")
-
-    parser.add_argument("--suffix", type=str)
-    subparsers = parser.add_subparsers(help="sub-command help", required=True)
-
-    parser_bootstrap = subparsers.add_parser(
-        "bootstrap", help="Bootstrap your add-on development environment"
-    )
-    parser_bootstrap.add_argument("--username", type=str, required=True)
-    parser_bootstrap.add_argument("--password", type=str, required=True)
-    parser_bootstrap.add_argument("--url", type=str, required=True)
-    parser_bootstrap.add_argument(
-        "--clean", action="store_true", default=False, help="Clean bootstrap"
-    )
-    parser_bootstrap.add_argument(
-        "--dir",
-        type=str,
-        nargs="*",
-        default=None,
-        help="Execute the command for the subset of the element directories specified.",
-    )
-    parser_bootstrap.set_defaults(func=bootstrap)
-
-    parser_build = subparsers.add_parser("build", help="Build your add-on")
-    parser_build.add_argument(
-        "--dir",
-        type=str,
-        nargs="*",
-        default=None,
-        help="Execute the command for the subset of the element directories specified.",
-    )
-    parser_build.set_defaults(func=build)
-
-    parser_deploy = subparsers.add_parser("deploy", help="Deploy your add-on")
-    parser_deploy.add_argument("--username", type=str)
-    parser_deploy.add_argument("--password", type=str)
-    parser_deploy.add_argument("--url", type=str)
-    parser_deploy.add_argument(
-        "--clean", action="store_true", default=False, help="Uninstall"
-    )
-    parser_deploy.add_argument(
-        "--replace", action="store_true", default=False, help="Replace elements"
-    )
-    parser_deploy.add_argument(
-        "--skip-build", action="store_true", default=False, help="Skip build step"
-    )
-    parser_deploy.set_defaults(func=deploy)
-
-    parser_package = subparsers.add_parser("package", help="Package your add-on")
-    parser_package.add_argument(
-        "--skip-build", action="store_true", default=False, help="Skip build step"
-    )
-    parser_package.set_defaults(func=package)
-
-    parser_watch = subparsers.add_parser(
-        "watch",
-        help="Build, watch, and live-update all or individual elements "
-        "whenever code in the elements changes",
-    )
-    parser_watch.add_argument("--username", type=str)
-    parser_watch.add_argument("--password", type=str)
-    parser_watch.add_argument("--url", type=str)
-    parser_watch.add_argument(
-        "--dir",
-        type=str,
-        nargs="*",
-        default=None,
-        help="Execute the command for the subset of the element directories specified.",
-    )
-    parser_watch.set_defaults(func=watch)
-
-    parser_test = subparsers.add_parser(
-        "test", help="Run the tests for all or individual elements"
-    )
-    parser_test.add_argument(
-        "--dir",
-        type=str,
-        nargs="*",
-        default=None,
-        help="Execute the command for the subset of the element directories specified.",
-    )
-    parser_test.set_defaults(func=elements_test)
-
-    parser_uninstall = subparsers.add_parser(
-        "uninstall", help="Uninstall the add-on from the Add-on Manager"
-    )
-    parser_uninstall.add_argument("--username", type=str)
-    parser_uninstall.add_argument("--password", type=str)
-    parser_uninstall.add_argument("--url", type=str)
-    parser_uninstall.set_defaults(func=uninstall)
-
-    parser_publish = subparsers.add_parser(
-        "publish", help="distribute add-on to artifactory"
-    )
-    parser_publish.add_argument(
-        "--skip-build", action="store_true", default=False, help="Skip build step"
-    )
-    parser_publish.set_defaults(func=publish)
-
-    parser_unpublish = subparsers.add_parser(
-        "unpublish", help="distribute add-on to artifactory"
-    )
-
-    parser_unpublish.set_defaults(func=unpublish)
-
-    options, unknown = parser.parse_known_args()
-    if hasattr(options, "suffix") and options.suffix is not None:
-        os.environ["ADD_ON_SUFFIX"] = options.suffix
-
-    options.func(options)

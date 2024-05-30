@@ -23,6 +23,10 @@ def load_jsonnet(path: pathlib.Path, tla_vars=None, save=False) -> Optional[dict
     return evaluated_jsonnet
 
 
+def get_add_on_suffix():
+    return os.environ.get("ADD_ON_SUFFIX", "")
+
+
 def save_json(path: pathlib.Path, values: dict) -> None:
     with open(path, mode="w", encoding="utf-8") as json_file:
         json.dump(values, json_file, indent=2, ensure_ascii=False)

@@ -5,9 +5,9 @@ import json
 import time
 import types
 from seeq import spy
-from build.session import get_project_id_from_name
+from ao.session import get_project_id_from_name
 
-from ao import (
+from ao.ao import (
     PROJECT_PATH,
     _parse_url_username_password,
     get_element_identifier_from_path,

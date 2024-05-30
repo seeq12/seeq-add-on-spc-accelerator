@@ -10,11 +10,8 @@ import venv
 from datetime import datetime
 from os.path import isdir, relpath
 from typing import List
-
-# TODO Remove this hack
-here = os.path.dirname(__file__)
-sys.path.append(os.path.join(here, ".."))
-from ao import get_element_identifier_from_path
+from ao.ao import get_element_identifier_from_path
+from ao.session import get_authenticated_session
 
 
 CURRENT_FILE = pathlib.Path(__file__)
@@ -45,50 +42,33 @@ TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 ELEMENT_PROJECT_NAME = get_element_identifier_from_path(ELEMENT_PATH)
 
 
-def check_dependencies() -> None:
-    pass
-
-
 def bootstrap(username: str, password: str, url: str, clean: bool) -> None:
     _create_virtual_environment(clean)
 
 
-def get_build_dependencies() -> List[str]:
-    return []
-
-
-def build() -> None:
-    pass
-
-
-def deploy(url: str, username: str, password: str) -> None:
-    # should not be delegated to the element, should be handled by ao.py
-    pass
-
-
 def get_files_to_package() -> List[str]:
-    from build import find_files_in_folder_recursively
+    from ao.element.add_on_tool import get_files_to_package
 
-    files_to_deploy = find_files_in_folder_recursively(
-        str(ELEMENT_PATH),
+    return get_files_to_package(
+        element_path=ELEMENT_PATH,
         file_extensions=FILE_EXTENSIONS,
         excluded_files=EXCLUDED_FILES,
         excluded_folders=EXCLUDED_FOLDERS,
     )
-    return files_to_deploy
 
 
 def watch(url: str, username: str, password: str) -> subprocess.Popen:
-    deploy(url, username, password)
-    return subprocess.Popen(
-        f"{PATH_TO_PYTHON} {CURRENT_FILE} --action watch"
-        f" --url {url} --username {username} --password {password}",
-        shell=True,
-    )
+    # already needs to be deployed to watch -- but deployment happens through the add-on-manager now
+    # deploy(url, username, password)
+    from ao.element.add_on_tool import watch
+
+    return watch(url, username, password, PATH_TO_PYTHON, CURRENT_FILE)
 
 
 def test() -> None:
-    subprocess.run(f"{PATH_TO_PYTEST}", cwd=ELEMENT_PATH, check=True, shell=True)
+    from ao.element.add_on_tool import test
+
+    return test(PATH_TO_PYTEST, ELEMENT_PATH)
 
 
 async def _watch_from_environment(url: str, username: str, password: str):
@@ -97,11 +77,11 @@ async def _watch_from_environment(url: str, username: str, password: str):
 
 
 async def hot_reload(url: str, username: str, password: str):
-    from build import file_matches_criteria
+    from ao import file_matches_criteria
     from watchfiles import awatch, Change
 
-    requests_session, auth_header, project_id = _get_authenticated_session(
-        url, username, password
+    requests_session, auth_header, project_id = get_authenticated_session(
+        url, ELEMENT_PROJECT_NAME, username, password
     )
     async for changes in awatch(ELEMENT_PATH):
         for change in changes:
@@ -137,12 +117,6 @@ async def hot_reload(url: str, username: str, password: str):
                         absolute_file_path,
                         destination,
                     )
-                # _shut_down_kernel(url, requests_session, auth_header, project_id)
-
-
-def _shut_down_kernel(url: str, requests_session, auth_header, project_id):
-    shut_down_endpoint = f"{url}/data-lab/{project_id}/functions/shutdown"
-    requests_session.post(shut_down_endpoint, headers=auth_header, cookies=auth_header)
 
 
 def _get_jupyter_contents_api_path(url, project_id, path):
@@ -279,8 +253,8 @@ def _create_virtual_environment(clean: bool = False):
 
 
 def _deploy_from_environment(url: str, username: str, password: str):
-    requests_session, auth_header, project_id = _get_authenticated_session(
-        url, username, password
+    requests_session, auth_header, project_id = get_authenticated_session(
+        url, ELEMENT_PROJECT_NAME, username, password
     )
     for destination in get_files_to_package():
         source = ELEMENT_PATH / destination
@@ -289,39 +263,29 @@ def _deploy_from_environment(url: str, username: str, password: str):
         )
 
 
-def _get_authenticated_session(url, username, password):
-    from seeq import sdk, spy
+def check_dependencies() -> None:
+    from ao.element.add_on_tool import check_dependencies
 
-    spy.login(username=username, password=password, url=url, quiet=True)
-    auth_header = {"sq-auth": spy.client.auth_token}
-    items_api = sdk.ItemsApi(spy.client)
-    response = items_api.search_items(
-        filters=[f"name=={ELEMENT_PROJECT_NAME}"], types=["Project"]
-    )
-    if len(response.items) == 0:
-        raise Exception(f"Could not find a project with name {ELEMENT_PROJECT_NAME}")
-    project_id = response.items[0].id
-    requests_session = _create_requests_session()
-    return requests_session, auth_header, project_id
+    return check_dependencies()
 
 
-def _create_requests_session():
-    import requests
-    from requests.adapters import HTTPAdapter, Retry
+def deploy(url: str, username: str, password: str) -> None:
+    # deploying is done through the add-on manager, should not be an element level function
+    from ao.element.add_on_tool import deploy
 
-    max_request_retries = 5
-    request_retry_status_list = [502, 503, 504]
-    _http_adapter = HTTPAdapter(
-        max_retries=Retry(
-            total=max_request_retries,
-            backoff_factor=0.5,
-            status_forcelist=request_retry_status_list,
-        )
-    )
-    request_session = requests.Session()
-    request_session.mount("http://", _http_adapter)
-    request_session.mount("https://", _http_adapter)
-    return request_session
+    return deploy()
+
+
+def get_build_dependencies() -> List[str]:
+    from ao.element.add_on_tool import get_build_dependencies
+
+    return get_build_dependencies()
+
+
+def build() -> None:
+    from ao.element.add_on_tool import build
+
+    return build()
 
 
 if __name__ == "__main__":

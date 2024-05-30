@@ -5,13 +5,19 @@
 # Exit on error
 set -e
 
-venv_path="build/.venv"
+venv_dir=".venv"
+DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT="$(dirname "$DIR")"
+venv_path="$(dirname "$DIR")/$venv_dir"
+
+# change to the parent directory of the script
+cd "$PARENT"
 
 if [ -d "$venv_path" ]; then
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-        "$venv_path/Scripts/python.exe" ao.py "$@"
+        "$venv_path/Scripts/python.exe" -m ao "$@"
     else
-        "$venv_path/bin/python" ao.py "$@"
+        "$venv_path/bin/python" -m ao "$@"
     fi
 else
     if [ "$1" = "bootstrap" ]; then
@@ -38,10 +44,10 @@ else
 
         # Use custom or system Python to run ao.py with the remaining arguments, including 'bootstrap'
         if [[ -n "$custom_python" ]]; then
-            "$custom_python" ao.py "${args[@]}"
+            "$custom_python" -m ao "${args[@]}"
         else
             if command -v python &> /dev/null; then
-                python ao.py "${args[@]}"
+                python -m ao "${args[@]}"
             else
                 echo "Error: Python not found. Please ensure Python is on your path or specify what Python to use with the --python flag."
                 exit 1
