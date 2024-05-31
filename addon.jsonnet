@@ -8,10 +8,16 @@ function(suffix='')
     identifier: add_on_identifier + hyphen_suffix,
     name: add_on_name + name_suffix,
     artifactory_dir: std.asciiLower((std.strReplace(add_on_name, ' ', '_') + underscore_suffix)),  // used when deploying to artifactory
-    description: 'DESCRIPTION HERE',  // this will show on the add-on manager
+    description: |||
+      Create Statistical Process Control (SPC) control charts and apply run rules
+
+      This Add-on is maintained by a member of the Seeq Analytics Engineering team. Feature requests and bugs are handled through GitHub, please submit these requests as issues in the corresponding GitHub repository:
+
+      https://github.com/seeq12/seeq-add-on-spc-accelerator/issues
+    |||,
     version: '0.1.0',
     license: 'Apache 2.0',
-    icon: 'fa fa-wrench',
+    icon: 'fa-bullseye',
     maintainer: 'Seeq Corporation',  // set to Seeq Corporation for AE developed add-ons
     previews: [
       'docs/source/_static/preview.png',
@@ -19,7 +25,7 @@ function(suffix='')
     elements: [
       {
         name: $.name,  // the UI name should match the overall add-on name
-        description: $.description,
+        description: 'Create Statistical Process Control (SPC) control charts and apply run rules',
         local element_identifier = 'ui',  // identifier for the element, needs to be unique amonst the elements
         identifier: add_on_identifier + '.' + element_identifier + hyphen_suffix,
         type: 'AddOnTool',
@@ -33,7 +39,7 @@ function(suffix='')
             display: {
               type: 'object',
               properties: {
-                icon: { type: 'string', default: 'fa fa-arrows-h' },
+                icon: { type: 'string', default: 'fa-bullseye' },
                 linkType: { enum: ['window', 'tab', 'none'], default: 'window' },
                 sortKey: { type: 'string', default: 'S' },
                 windowDetails: { type: 'string', default: 'toolbar=0,location=0,scrollbars=1,statusbar=0,menubar=0,resizable=1,height=925,width=425' },

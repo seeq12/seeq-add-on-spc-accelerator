@@ -1,6 +1,21 @@
-# Seeq SPC Accelerator
+
+<div align="center">
+
+# SPC Accelerator
+
+
+[User Guide](https://seeq12.github.io/seeq-add-on-spc-accelerator/user_guide.html) • [Getting Help](https://seeq12.github.io/seeq-add-on-spc-accelerator/getting_help.html)
+
 ![Deploy & Test](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/ci.yml/badge.svg)
 ![Nightly Tests](https://github.com/seeq12/seeq-add-on-spc-accelerator/actions/workflows/nightly.yml/badge.svg)
+
+<img src="docs/source/_static/preview.png" alt="preview" height="750"/>
+
+The SPC Accelerator add-on allows you to create Statistical Process Control (SPC) control charts and apply run rules to signals in Seeq.
+
+</div>
+
+---
 
 ## Development
 
@@ -85,7 +100,7 @@ To add a new page to the documentation, add a new markdown file to the `docs/sou
 
 To add a new image to the documentation, add the image to the `docs/source/_static` directory and reference it in the markdown file.
 
-To add this functionality to a new project:
+#### To add this functionality to a new project:
 - Copy the `docs` directory from this project to the new project and update the `conf.py` file to include the new project name.
 - Copy the .github/workflows/pages.yml file to the new project to enable the GitHub Pages deployment. 
 - Follow [these instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow) to enable publishing to GitHub Pages via a workflow. You don't have to setup the workflow, just select 'GitHub Action's as the source.

@@ -159,3 +159,6 @@ __pycache__/
 # switch from json to jsonnet, ignore the json files now
 addon.json
 formula_package.json
+
+# cred files
+*.key

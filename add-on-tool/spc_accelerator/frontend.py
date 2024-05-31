@@ -24,14 +24,14 @@ def frontend(signal_list, condition_list, start_time, end_time):
     input_condition = v.Select(
         v_model=condition_list,
         items=condition_list,
-        label="(Optional) Condition Filter",
+        label="Condition Filter (Optional)",
         clearable=True,
         no_data_text="No conditions found on worksheet",
     )
     capsule_property = v.Select(
         v_model=property_list,
         items=property_list,
-        label="(Optional) Separate By Capsule Property",
+        label="Separate By Capsule Property (Optional)",
         clearable=True,
         no_data_text="No properties found on condition",
     )
