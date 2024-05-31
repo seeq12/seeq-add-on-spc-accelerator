@@ -6,7 +6,7 @@ import inspect
 warnings.filterwarnings("ignore")
 
 import ipyvuetify as v
-import ipydatetime
+import ipywidgets
 from seeq import spy, sdk
 from datetime import datetime, timedelta, timezone
 from datetime import datetime
@@ -173,6 +173,13 @@ def test_spc_accelerator_object_created_successfully(spc_accelerator_testing):
     worksheet_id = test_workbooks[current_test_name]["worksheet_id"]
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
+    # ipywidgets 7 needs separate ipydatetime import
+    # ipywidgets 8 has ipydatetime included in ipywidgets
+    if ipywidgets.__version__.startswith("7"):
+        from ipydatetime import DatetimePicker
+    else:
+        from ipywidgets import DatetimePicker
+
     assert spc_accelerator.URL == url
     assert spc_accelerator.workbook_id == workbook_id
     assert spc_accelerator.worksheet_id == worksheet_id
@@ -188,8 +195,8 @@ def test_spc_accelerator_object_created_successfully(spc_accelerator_testing):
     assert isinstance(spc_accelerator.interpolation_units, v.Select)
     assert isinstance(spc_accelerator.input_condition, v.Select)
     assert isinstance(spc_accelerator.capsule_property, v.Select)
-    assert isinstance(spc_accelerator.start_select, ipydatetime.DatetimePicker)
-    assert isinstance(spc_accelerator.end_select, ipydatetime.DatetimePicker)
+    assert isinstance(spc_accelerator.start_select, DatetimePicker)
+    assert isinstance(spc_accelerator.end_select, DatetimePicker)
     assert isinstance(spc_accelerator.apply_to_condition, v.Select)
     assert isinstance(spc_accelerator.control_chart, v.Checkbox)
     assert isinstance(spc_accelerator.we_runrules, v.Checkbox)

@@ -1,5 +1,5 @@
 import ipyvuetify as v
-import ipydatetime
+import ipywidgets
 
 
 def frontend(signal_list, condition_list, start_time, end_time):
@@ -36,10 +36,15 @@ def frontend(signal_list, condition_list, start_time, end_time):
         no_data_text="No properties found on condition",
     )
 
-    start_select = ipydatetime.DatetimePicker(
-        description="Start Time: ", value=start_time
-    )
-    end_select = ipydatetime.DatetimePicker(description="End Time: ", value=end_time)
+    # ipywidgets 7 needs separate ipydatetime import
+    # ipywidgets 8 has ipydatetime included in ipywidgets
+    if ipywidgets.__version__.startswith("7"):
+        from ipydatetime import DatetimePicker
+    else:
+        from ipywidgets import DatetimePicker
+
+    start_select = DatetimePicker(description="Start Time: ", value=start_time)
+    end_select = DatetimePicker(description="End Time: ", value=end_time)
 
     apply_to_condition = v.Select(
         v_model=condition_list,
