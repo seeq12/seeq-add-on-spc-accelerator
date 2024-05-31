@@ -24,15 +24,15 @@ The SPC Accelerator Add-on is available to be installed and updated using the Ad
 6. If a Condition Filter was chosen, choose the 'Apply to Condition.' This may be the same condition selected above, or a different condition.
 7. Select the additional desired outputs: Control Chart, Western Electric Run Rules, Nelson Run Rules, Histogram Normality Check.
 
-### 3.3 SPC Accelerator Output
+### 4.0 SPC Accelerator Output
 
 Once all of the selections are made and the add-on is executed, it will create new worksheets for each signal and output selection. For example, if an input signal and Control Chart and Nelson Run Rules are selected, a worksheet will be created for the control chart, containing a control chart, and a worksheet will be created for the Neson Run Rules, containing a control and the Nelson Run Rules conditions. 
 
-### 3.3 Supplemental Run Rules Information
+### 5.0 Supplemental Run Rules Information
 
 See the table for information on the run rule conditions created using the SPC Accelerator Add-on.
 
-![Image](_static\run_rules_we_n.png)
+![Image](_static/run_rules_we_n.png)
 
 Run Rules with Seeq Screenshots:
 
