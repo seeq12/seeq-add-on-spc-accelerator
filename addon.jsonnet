@@ -15,7 +15,7 @@ function(suffix='')
 
       https://github.com/seeq12/seeq-add-on-spc-accelerator/issues
     |||,
-    version: '0.1.0',
+    version: '1.0.0',
     license: 'Apache 2.0',
     icon: 'fa-bullseye',
     maintainer: 'Seeq Corporation',  // set to Seeq Corporation for AE developed add-ons
@@ -33,6 +33,10 @@ function(suffix='')
         notebook_file_path: 'SPC Accelerator.ipynb',
         resource_size: 'GP_S',
         extensions: [],
+        known_aliases: [
+          'SPC Accelerator',
+          'Statistical Process Control (SPC)',
+        ],
         configuration_schema: {
           type: 'object',
           properties: {

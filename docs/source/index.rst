@@ -12,6 +12,6 @@ SPC Accelerator Documentation
 
    Introduction <introduction.md>
    User Guide <user_guide.md>
-   Release Notes <release_notes.md>
+   Release Notes <release_notes.rst>
    Getting Help <getting_help.md>
    License <license.md>

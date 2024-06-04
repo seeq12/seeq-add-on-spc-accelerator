@@ -36,3 +36,31 @@
     background-color: #00FA87 !important;
     color: #081F2C !important;
 }
+
+table {
+    border-collapse: collapse;
+}
+
+table td {
+    padding: 15px;
+}
+
+table thead td {
+    background-color: #081F2C;
+    color: #ffffff;
+    font-weight: bold;
+    border: 1px solid #081F2C;
+}
+
+table tbody td {
+    color: #081F2C;
+    border: 1px solid #e1e4e5;
+}
+
+table tbody tr {
+    background-color: #f9fafb;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
