@@ -1,0 +1,61 @@
+# Title for the gitleaks configuration file.
+title = "Seeq Gitleaks"
+
+# Extend the base (this) configuration. When you extend a configuration
+# the base rules take precedence over the extended rules. I.e., if there are
+# duplicate rules in both the base configuration and the extended configuration
+# the base rules will override the extended rules.
+# Another thing to know with extending configurations is you can chain together
+# multiple configuration files to a depth of 2. Allowlist arrays are appended
+# and can contain duplicates.
+# useDefault and path can NOT be used at the same time. Choose one.
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config:
+# https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+# An array of tables that contain information that define instructions
+# on how to detect secrets
+[[rules]]
+
+# Unique identifier for this rule
+id = "Access Key"
+
+# Short human readable description of the rule.
+description = "generated access key from Seeq. 30 alphanumeric characters long"
+
+# Golang regular expression used to detect secrets. Note Golang's regex engine
+# does not support lookaheads.
+regex = '''\b[A-Za-z0-9]{30}\b'''
+
+# Array of strings used for metadata and reporting purposes.
+tags = ["Seeq"]
+
+# Float representing the minimum shannon entropy a regex group must have to be considered a secret.
+entropy = 0
+
+[[rules]]
+
+# Unique identifier for this rule
+id = "Seeq Email"
+
+# Short human readable description of the rule.
+description = "Seeq Email - may indicate logging in with a Seeq domain account"
+
+# Golang regular expression used to detect secrets. Note Golang's regex engine
+# does not support lookaheads.
+regex = '''@seeq.com'''
+
+# Array of strings used for metadata and reporting purposes.
+tags = ["Seeq"]
+
+# Float representing the minimum shannon entropy a regex group must have to be considered a secret.
+entropy = 0
+
+[rules.allowlist]
+regexTarget = "line"
+regexes = ['creatorContactInfo']
+
+[allowlist]
+# 
+commits = ["45b2cddeb3633143486a32a85399a0f988be1342"]
