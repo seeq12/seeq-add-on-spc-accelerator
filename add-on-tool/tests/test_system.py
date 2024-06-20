@@ -116,8 +116,8 @@ def spc_accelerator_testing(request):
 
         # Insert a new condition called 'Temperature > 90' into 'Asset A'
         addon_tree.insert(
-            name="Temperature > 90",
-            formula="""($temp > 90).setMaximumDuration(1d)
+            name="Temperature > 75",
+            formula="""($temp > 75).setMaximumDuration(1d)
     .transform($capsule ->
     $capsule.setProperty('Date','Date '+$capsule.property('start').tostring().replace('/(.*)(T.*)/','$1'))) """,
             formula_parameters={"$temp": "Temperature"},
