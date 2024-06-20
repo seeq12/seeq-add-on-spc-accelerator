@@ -106,9 +106,7 @@ def spc_accelerator_testing(request):
         )
 
         # Create a new asset tree called 'SPC Addon'
-        addon_tree = spy.assets.Tree(
-            "SPC Addon", workbook=f"SPC Accelerator >> {workbook_name}", quiet=True
-        )
+        addon_tree = spy.assets.Tree("SPC Addon", workbook=workbook_name, quiet=True)
 
         # Insert a new asset called 'Asset A' into the tree
         addon_tree.insert(children="Asset A", quiet=True)
