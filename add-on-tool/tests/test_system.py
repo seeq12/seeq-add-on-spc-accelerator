@@ -106,7 +106,9 @@ def spc_accelerator_testing(request):
         )
 
         # Create a new asset tree called 'SPC Addon'
-        addon_tree = spy.assets.Tree("SPC Addon", workbook=workbook_name, quiet=True)
+        addon_tree = spy.assets.Tree(
+            "SPC Addon", workbook=f"SPC Accelerator >> {workbook_name}", quiet=True
+        )
 
         # Insert a new asset called 'Asset A' into the tree
         addon_tree.insert(children="Asset A", quiet=True)
@@ -117,7 +119,7 @@ def spc_accelerator_testing(request):
         # Insert a new condition called 'Temperature > 90' into 'Asset A'
         addon_tree.insert(
             name="Temperature > 75",
-            formula="""($temp > 75).setMaximumDuration(1d)
+            formula="""($temp > 75).intersect(days())
     .transform($capsule ->
     $capsule.setProperty('Date','Date '+$capsule.property('start').tostring().replace('/(.*)(T.*)/','$1'))) """,
             formula_parameters={"$temp": "Temperature"},
