@@ -117,7 +117,7 @@ def spc_accelerator_testing(request):
         # Insert a new condition called 'Temperature Normalized > .9' into 'Asset A'
         addon_tree.insert(
             name="Temperature Normalized > .9",
-            formula="""$temp_norm = $temp/($temp.aggregate('maxValue', days(), startKey()))
+            formula="""$temp_norm = $temp/($temp.aggregate(maxValue(), days(), startKey()))
             ($temp_norm > .9).intersect(days())
     .transform($capsule ->
     $capsule.setProperty('Date','Date '+$capsule.property('start').tostring().replace('/(.*)(T.*)/','$1'))) """,
