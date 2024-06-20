@@ -114,10 +114,11 @@ def spc_accelerator_testing(request):
         # Assign the 'Temperature' signal to 'Asset A'
         addon_tree.insert(children=search_results, parent="Asset A", quiet=True)
 
-        # Insert a new condition called 'Temperature > 90' into 'Asset A'
+        # Insert a new condition called 'Temperature Normalized > .9' into 'Asset A'
         addon_tree.insert(
-            name="Temperature > 90",
-            formula="""($temp > 90).setMaximumDuration(1d)
+            name="Temperature Normalized > .9",
+            formula="""$temp_norm = $temp/($temp.aggregate(maxValue(), days(), startKey()))
+            ($temp_norm > .9).intersect(days())
     .transform($capsule ->
     $capsule.setProperty('Date','Date '+$capsule.property('start').tostring().replace('/(.*)(T.*)/','$1'))) """,
             formula_parameters={"$temp": "Temperature"},
@@ -259,8 +260,8 @@ def test_create_control_chart_signal_condition(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
-    spc_accelerator.apply_to_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
+    spc_accelerator.apply_to_condition.v_model = "Temperature Normalized > .9"
 
     # Call the input_validation method
     spc_accelerator.input_validation()
@@ -281,8 +282,8 @@ def test_create_control_chart_signal_condition(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
-    spc_accelerator.apply_to_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
+    spc_accelerator.apply_to_condition.v_model = "Temperature Normalized > .9"
 
     # Call the input_validation method
     spc_accelerator.input_validation()
@@ -303,8 +304,8 @@ def test_create_control_chart_we_runrules(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
-    spc_accelerator.apply_to_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
+    spc_accelerator.apply_to_condition.v_model = "Temperature Normalized > .9"
     spc_accelerator.we_runrules.v_model = True
 
     # Call the input_validation method
@@ -326,8 +327,8 @@ def test_create_control_chart_nelson_runrules(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
-    spc_accelerator.apply_to_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
+    spc_accelerator.apply_to_condition.v_model = "Temperature Normalized > .9"
     spc_accelerator.nelson_runrules.v_model = True
 
     # Call the input_validation method
@@ -349,8 +350,8 @@ def test_create_control_chart_histogram(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
-    spc_accelerator.apply_to_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
+    spc_accelerator.apply_to_condition.v_model = "Temperature Normalized > .9"
     spc_accelerator.histogram.v_model = True
 
     # Call the input_validation method
@@ -372,8 +373,8 @@ def test_create_control_chart_capsule_prop(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
-    spc_accelerator.apply_to_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
+    spc_accelerator.apply_to_condition.v_model = "Temperature Normalized > .9"
     spc_accelerator.capsule_property.v_model = "Date"
 
     # Call the input_validation method
@@ -395,7 +396,7 @@ def test_create_control_chart_apply_condition(spc_accelerator_testing):
     spc_accelerator = SPCAccelerator(url, workbook_id, worksheet_id)
 
     spc_accelerator.input_signal.v_model = ["Temperature"]
-    spc_accelerator.input_condition.v_model = "Temperature > 90"
+    spc_accelerator.input_condition.v_model = "Temperature Normalized > .9"
     # spc_accelerator.capsule_property.v_model = 'Date'
     spc_accelerator.apply_to_condition.v_model = "Days"
 
