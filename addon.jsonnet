@@ -33,10 +33,6 @@ function(suffix='')
         notebook_file_path: 'SPC Accelerator.ipynb',
         resource_size: 'GP_S',
         extensions: [],
-        known_aliases: [
-          'SPC Accelerator',
-          'Statistical Process Control (SPC)',
-        ],
         configuration_schema: {
           type: 'object',
           properties: {
