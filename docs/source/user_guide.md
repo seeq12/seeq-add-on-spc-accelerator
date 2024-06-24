@@ -13,7 +13,10 @@ The SPC Chart created with the Add-on is a simple implementation of an Individua
 
 ## Installation
 
-The **SPC Accelerator** Add-on can be installed via [Add-on Manager](https://support.seeq.com/kb/latest/cloud/the-add-on-manager) by a Seeq administrator. Once the **SPC Accelerator** Add-on has been installed, it will be available for all users given access. If the **SPC Accelerator** Add-on does not appear in the Add-on Manager, contact your Seeq account team. 
+The **SPC Accelerator** Add-on can be installed via [Add-on Manager](https://support.seeq.com/kb/latest/cloud/the-add-on-manager) by a Seeq administrator. Once the **SPC Accelerator** Add-on has been installed, it will be available for all users given access. If the **SPC Accelerator** Add-on does not appear in the Add-on Manager, contact your Seeq account team.
+
+```{attention} If a version of SPC Accelerator was installed manually prior to Add-on Manager, we recommend uninstalling this copy using the Add-on Manager prior to installing the SPC Accelerator.
+```
 
 ## Usage
 

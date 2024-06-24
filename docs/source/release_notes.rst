@@ -1,6 +1,6 @@
 
 Release Notes
-==========
+===========================
 .. list-table::
    :header-rows: 1
    :widths: 10, 35, 35
