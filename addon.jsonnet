@@ -30,6 +30,8 @@ function(suffix='')
         identifier: add_on_identifier + '.' + element_identifier + hyphen_suffix,
         type: 'AddOnTool',
         path: 'add-on-tool',
+        notebook_file_path: 'SPC Accelerator.ipynb',
+        resource_size: 'GP_S',
         extensions: [],
         configuration_schema: {
           type: 'object',
