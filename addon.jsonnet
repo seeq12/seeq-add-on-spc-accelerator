@@ -31,7 +31,6 @@ function(suffix='')
         type: 'AddOnTool',
         path: 'add-on-tool',
         notebook_file_path: 'SPC Accelerator.ipynb',
-        resource_size: 'GP_S',
         extensions: [],
         configuration_schema: {
           type: 'object',
