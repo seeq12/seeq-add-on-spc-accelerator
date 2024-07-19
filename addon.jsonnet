@@ -15,7 +15,7 @@ function(suffix='')
 
       https://github.com/seeq12/seeq-add-on-spc-accelerator/issues
     |||,
-    version: '1.0.0',
+    version: '1.0.1',
     license: 'Apache 2.0',
     icon: 'fa-bullseye',
     maintainer: 'Seeq Corporation',  // set to Seeq Corporation for AE developed add-ons
