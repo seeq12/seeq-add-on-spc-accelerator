@@ -1,10 +1,45 @@
 import pytest
 import re
-from seeq import spy
+from seeq import spy, sdk
 from urllib.parse import urlencode
 import datetime
 import pytz
 from playwright.sync_api import expect, Page, APIRequestContext
+from typing import Generator
+
+
+@pytest.fixture
+def add_on_query_params(
+    api_request_context: APIRequestContext, page: Page, url: str, element_identifier
+) -> Generator[dict, None, None]:
+    """
+    Creates basic workbook for e2e test using workbook url builder
+    """
+    browser_context = page.context.browser.new_context(
+        storage_state=api_request_context.storage_state()
+    )
+    workbench_page = browser_context.new_page()
+    workbench_query_params = {
+        "trendItems": "Example>>Cooling Tower 1>>Area B>>Temperature",
+        "workbookName": f"{element_identifier} {datetime.datetime.now(pytz.utc).isoformat()}",
+    }
+    workbook_builder_url = (
+        f"{url}/workbook/builder/?{urlencode(workbench_query_params)}"
+    )
+    # capture the redirect to the built workbench
+    workbench_page.goto(workbook_builder_url)
+    workbench_page.wait_for_url("**/workbook/*/worksheet/*")
+    expect(workbench_page.locator("id=header")).to_be_visible()
+
+    workbook_id = spy.utils.get_workbook_id_from_url(workbench_page.url)
+    worksheet_id = spy.utils.get_worksheet_id_from_url(workbench_page.url)
+    yield {
+        "workbookId": workbook_id,
+        "worksheetId": worksheet_id,
+    }
+
+    # cleanup - delete workbook
+    sdk.ItemsApi(spy.client).archive_item(id=workbook_id)
 
 
 # To lookup a datalab project ID, parametrize the test
@@ -18,7 +53,7 @@ def test_add_on(
     url: str,
     project_id,
     element_config,
-    element_identifier,
+    add_on_query_params,
 ) -> None:
     """
     End to end test that uses a combination of SPy and Playwright:
@@ -36,29 +71,28 @@ def test_add_on(
     browser_context = page.context.browser.new_context(
         storage_state=api_request_context.storage_state()
     )
-    workbench_page = browser_context.new_page()
-    workbench_query_params = {
-        "trendItems": "Example>>Cooling Tower 1>>Area B>>Temperature",
-        "workbookName": f"{element_identifier} {datetime.datetime.now(pytz.utc).isoformat()}",
-    }
-    workbook_builder_url = (
-        f"{url}/workbook/builder/?{urlencode(workbench_query_params)}"
-    )
-    # capture the redirect to the built workbench
-    workbench_page.goto(workbook_builder_url)
-    workbench_page.wait_for_url("**/workbook/*/worksheet/*")
-    expect(workbench_page.locator("id=header")).to_be_visible()
+    # workbench_page = browser_context.new_page()
+    # workbench_query_params = {
+    #     "trendItems": "Example>>Cooling Tower 1>>Area B>>Temperature",
+    #     "workbookName": f"{element_identifier} {datetime.datetime.now(pytz.utc).isoformat()}",
+    # }
+    # workbook_builder_url = (
+    #     f"{url}/workbook/builder/?{urlencode(workbench_query_params)}"
+    # )
+    # # capture the redirect to the built workbench
+    # workbench_page.goto(workbook_builder_url)
+    # workbench_page.wait_for_url("**/workbook/*/worksheet/*")
+    # expect(workbench_page.locator("id=header")).to_be_visible()
 
-    workbench_url = workbench_page.url
-    workbook_id = spy._url.get_workbook_id_from_url(workbench_url)
-    worksheet_id = spy._url.get_worksheet_id_from_url(workbench_url)
+    # workbook_id = spy.utils.get_workbook_id_from_url(test_workbook_url)
+    # worksheet_id = spy.utils.get_worksheet_id_from_url(test_workbook_url)
 
     # load the add-on with query parameters
     notebook_path = element_config["notebook_file_path"]
-    add_on_query_params = {
-        "workbookId": workbook_id,
-        "worksheetId": worksheet_id,
-    }
+    # add_on_query_params = {
+    #     "workbookId": workbook_id,
+    #     "worksheetId": worksheet_id,
+    # }
     add_on_url = f"""
     {url}/data-lab/{project_id}/addon/{notebook_path}?{urlencode(add_on_query_params)}
     """
@@ -76,6 +110,6 @@ def test_add_on(
         "link"
     ).click()
 
-    workbook = spy.workbooks.pull(workbook_id)[0]
+    workbook = spy.workbooks.pull(add_on_query_params["workbookId"])[0]
     worksheets = {ws.name for ws in workbook.worksheets}
     assert expected_worksheets.issubset(worksheets)
