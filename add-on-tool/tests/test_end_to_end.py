@@ -71,28 +71,10 @@ def test_add_on(
     browser_context = page.context.browser.new_context(
         storage_state=api_request_context.storage_state()
     )
-    # workbench_page = browser_context.new_page()
-    # workbench_query_params = {
-    #     "trendItems": "Example>>Cooling Tower 1>>Area B>>Temperature",
-    #     "workbookName": f"{element_identifier} {datetime.datetime.now(pytz.utc).isoformat()}",
-    # }
-    # workbook_builder_url = (
-    #     f"{url}/workbook/builder/?{urlencode(workbench_query_params)}"
-    # )
-    # # capture the redirect to the built workbench
-    # workbench_page.goto(workbook_builder_url)
-    # workbench_page.wait_for_url("**/workbook/*/worksheet/*")
-    # expect(workbench_page.locator("id=header")).to_be_visible()
-
-    # workbook_id = spy.utils.get_workbook_id_from_url(test_workbook_url)
-    # worksheet_id = spy.utils.get_worksheet_id_from_url(test_workbook_url)
 
     # load the add-on with query parameters
     notebook_path = element_config["notebook_file_path"]
-    # add_on_query_params = {
-    #     "workbookId": workbook_id,
-    #     "worksheetId": worksheet_id,
-    # }
+
     add_on_url = f"""
     {url}/data-lab/{project_id}/addon/{notebook_path}?{urlencode(add_on_query_params)}
     """
