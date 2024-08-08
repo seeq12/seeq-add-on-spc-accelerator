@@ -20,7 +20,7 @@ def add_on_query_params(
     )
     workbench_page = browser_context.new_page()
     workbench_query_params = {
-        "trendItems": "Example>>Cooling Tower 1>>Area B>>Temperature",
+        "trendItems": "Example>>Cooling Tower 2>>Area E>>Temperature",
         "workbookName": f"{element_identifier} {datetime.datetime.now(pytz.utc).isoformat()}",
     }
     workbook_builder_url = (
