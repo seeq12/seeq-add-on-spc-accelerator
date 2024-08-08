@@ -162,7 +162,12 @@ def spc_accelerator_testing(request):
             "worksheet_id": worksheet_id,
         }
 
-    return test_workbooks
+    yield test_workbooks
+
+    # teardown logic - archive the workbooks
+    items_api = sdk.ItemsApi(spy.client)
+    for test in test_workbooks:
+        items_api.archive_item(id=test_workbooks[test]["workbook_id"])
 
 
 @pytest.mark.system
