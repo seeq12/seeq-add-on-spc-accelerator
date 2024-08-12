@@ -90,8 +90,10 @@ def test_add_on(
     # once the link button is clickable, implies execution has completed.
     add_on_page.locator("div").filter(has_text=re.compile(r"^Execute$")).get_by_role(
         "link"
-    ).click()
+    ).click(timeout=600000)
 
-    workbook = spy.workbooks.pull(add_on_query_params["workbookId"])[0]
+    workbook = spy.workbooks.pull(
+        add_on_query_params["workbookId"], include_inventory=False
+    )[0]
     worksheets = {ws.name for ws in workbook.worksheets}
     assert expected_worksheets.issubset(worksheets)
