@@ -15,7 +15,7 @@ def create_template(
     histogram_dict,
 ):
     workbooks_api = sdk.WorkbooksApi(spy.client)
-    wb = spy.workbooks.pull(URL, quiet=True)
+    wb = spy.workbooks.pull(URL, include_inventory=False, quiet=True)
     ws = wb[0].worksheets
     new_worksheet_ids = []
     for worksheet_name, item_ids in display_dict.items():
@@ -52,7 +52,7 @@ def create_template(
                 "Start": start_select.value,
                 "End": end_select.value,
             }
-    spy.workbooks.push(wb, quiet=True)
+    spy.workbooks.push(wb, include_inventory=False, quiet=True)
     first_new_worksheet = [w for w in ws if w.name == list(display_dict.keys())[0]][0]
     workbook_button.href = first_new_worksheet.url
     for worksheet in new_worksheet_ids:
@@ -131,7 +131,7 @@ def format_histogram_worksheet(histogram_id, signal_name, URL, workbook_id):
         errors="catalog",
         quiet=True,
     )
-    wb = spy.workbooks.pull(URL, quiet=True)
+    wb = spy.workbooks.pull(URL, include_inventory=False, quiet=True)
 
     try:
         ws = wb[0].worksheets[
@@ -143,7 +143,7 @@ def format_histogram_worksheet(histogram_id, signal_name, URL, workbook_id):
                 ws = sheet
 
     ws.display_items = pd.DataFrame(columns=["Name", "Type", "ID"])
-    spy.workbooks.push(wb, quiet=True)
+    spy.workbooks.push(wb, include_inventory=False, quiet=True)
     worksheet_url = push_histogram.spy.workbook_url
     histogram_worksheet_id = worksheet_url.split("/").pop(-1)
     workstep_id = (
