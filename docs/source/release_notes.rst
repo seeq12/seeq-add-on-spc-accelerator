@@ -12,3 +12,11 @@ Release Notes
    * - 1.0.0
      - Initial Release
      - 
+
+   * - 1.0.1
+     - Use default add-on resource size to prevent install errors
+     -
+  
+   * - 1.0.2
+     - Add-on now skips full workbook inventory pushes and pulls
+     - 

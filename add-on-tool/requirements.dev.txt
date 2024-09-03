@@ -1,5 +1,5 @@
 seeq
-seeq-spy
+seeq-spy[all]
 wheel
 jsonnet; platform_system != "Windows"
 jsonnet-binary; platform_system == "Windows"

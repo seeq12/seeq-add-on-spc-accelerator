@@ -15,7 +15,7 @@ function(suffix='')
 
       https://github.com/seeq12/seeq-add-on-spc-accelerator/issues
     |||,
-    version: '1.0.1',
+    version: '1.0.2',
     license: 'Apache 2.0',
     icon: 'fa-bullseye',
     maintainer: 'Seeq Corporation',  // set to Seeq Corporation for AE developed add-ons
@@ -55,8 +55,18 @@ function(suffix='')
                 suffix: { type: 'string', default: suffix },
               },
             },
+            advanced_project_configuration: {
+              type: 'object',
+              required: ['kernel_name'],
+              properties: {
+                kernel_name: {
+                  type: 'string',
+                  default: 'python38'
+                }
+              }
+            }
           },
-          required: ['display'] + if suffix != '' then ['project'] else [],
+          required: ['display', 'advanced_project_configuration'] + if suffix != '' then ['project'] else [],
         },
         configuration_filename: 'configuration',  // name of the file dropped in the add-on-tool project
         configuration_converter: 'json',  // options for ini, toml, json

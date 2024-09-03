@@ -51,7 +51,7 @@ def spc_accelerator_testing(request):
 
         workbooks_df = spy.workbooks.search({"Name": workbook_name}, quiet=True)
 
-        wb = spy.workbooks.pull(workbooks_df, quiet=True)
+        wb = spy.workbooks.pull(workbooks_df, include_inventory=False, quiet=True)
 
         # Find the workbook with the workbook_name
         workbook = next((w for w in wb if w.name == workbook_name), None)
@@ -69,7 +69,7 @@ def spc_accelerator_testing(request):
             )
             matching_worksheet.display_range = {"Start": start_time, "End": end_time}
 
-        push_result = spy.workbooks.push(wb, quiet=True)
+        push_result = spy.workbooks.push(wb, include_inventory=False, quiet=True)
 
         push_url = push_result["URL"][0]
         workbook_id = spy.utils.get_workbook_id_from_url(push_url)
