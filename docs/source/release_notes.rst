@@ -20,3 +20,5 @@ Release Notes
    * - 1.0.2
      - Add-on now skips full workbook inventory pushes and pulls
      - 
+   * - 1.03
+     - Update default Python kernel to 3.11
