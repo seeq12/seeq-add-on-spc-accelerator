@@ -24,3 +24,7 @@ Release Notes
    * - 1.0.3
      - Update default Python kernel to Python 3.11
      -      
+
+   * - 1.1.0
+     - Discrete signals are now supported
+     - 

@@ -12,6 +12,9 @@ def pull_worksheet_data(URL, workbook_id, worksheet_id):
         worksheet_items = spy.search(URL, quiet=True)
         signals = worksheet_items[worksheet_items["Type"].str.contains("Signal")]
         signal_list = signals["Name"].to_list()
+        signals_with_properties = spy.search(
+            signals, include_properties=["Interpolation Method"], quiet=True
+        )
         conditions = worksheet_items[worksheet_items["Type"].str.contains("Condition")]
         condition_list = conditions["Name"].to_list()
         workstep_id = (
@@ -31,7 +34,14 @@ def pull_worksheet_data(URL, workbook_id, worksheet_id):
         start_time = datetime.fromtimestamp(start / 1000).astimezone()
         end_time = datetime.fromtimestamp(end / 1000).astimezone()
 
-        return signal_list, condition_list, start_time, end_time, signals, conditions
+        return (
+            signal_list,
+            condition_list,
+            start_time,
+            end_time,
+            signals_with_properties,
+            conditions,
+        )
     except:
         worksheet_items = pd.DataFrame()
         signals = pd.DataFrame()

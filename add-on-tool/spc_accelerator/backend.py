@@ -479,14 +479,18 @@ def create_limit_signals(mean_stddev_push_df, signal_name):
 def western_electric_df(
     limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals
 ):
+    input_signal = signals[signals["Name"] == signal_name]
+    # in order to handle discrete, we want to coerce to step using the max interp specified on the UI
+    is_discrete = (input_signal["Interpolation Method"] == "None").any()
+    input_coercion_fragment = f".toStep({interp_value})" if is_discrete else ""
     western_electric_rules_df = pd.DataFrame(
         [
             {
                 "Name": f"{signal_name}: Western Electric Run Rule 1",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule1($minus3sd, $plus3sd)",
+                "Formula": f"$inputsignal{input_coercion_fragment}.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule1($minus3sd, $plus3sd)",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus3sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -3 Sigma"
                     ],
@@ -498,11 +502,11 @@ def western_electric_df(
             {
                 "Name": f"{signal_name}: Western Electric Run Rule 2",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule2($minus2sd, $plus2sd, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule2($minus2sd, $plus2sd, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus2sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -2 Sigma"
                     ],
@@ -514,11 +518,11 @@ def western_electric_df(
             {
                 "Name": f"{signal_name}: Western Electric Run Rule 3",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule3($minus1sd, $plus1sd, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule3($minus1sd, $plus1sd, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus1sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -1 Sigma"
                     ],
@@ -530,11 +534,11 @@ def western_electric_df(
             {
                 "Name": f"{signal_name}: Western Electric Run Rule 4",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule4($mean, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.WesternElectricRunRules{ADD_ON_SUFFIX}_RunRule4($mean, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$mean": mean_stddev_push_df[
                         mean_stddev_push_df["Name"] == f"{signal_name}: Mean"
                     ],
@@ -546,14 +550,19 @@ def western_electric_df(
 
 
 def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals):
+    input_signal = signals[signals["Name"] == signal_name]
+    # in order to handle discrete, we want to coerce to step using the max interp specified on the UI
+    is_discrete = (input_signal["Interpolation Method"] == "None").any()
+    input_coercion_fragment = f".toStep({interp_value})" if is_discrete else ""
+
     nelson_rules_df = pd.DataFrame(
         [
             {
                 "Name": f"{signal_name}: Nelson Run Rule 1",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule1($minus3sd, $plus3sd)",
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule1($minus3sd, $plus3sd)",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus3sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -3 Sigma"
                     ],
@@ -565,11 +574,11 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
             {
                 "Name": f"{signal_name}: Nelson Run Rule 2",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule2($mean, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule2($mean, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$mean": mean_stddev_push_df[
                         mean_stddev_push_df["Name"] == f"{signal_name}: Mean"
                     ],
@@ -578,31 +587,27 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
             {
                 "Name": f"{signal_name}: Nelson Run Rule 3",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule3("
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule3("
                 + interp_value
                 + ")",
-                "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name]
-                },
+                "Formula Parameters": {"$inputsignal": input_signal},
             },
             {
                 "Name": f"{signal_name}: Nelson Run Rule 4",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule4("
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule4("
                 + interp_value
                 + ")",
-                "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name]
-                },
+                "Formula Parameters": {"$inputsignal": input_signal},
             },
             {
                 "Name": f"{signal_name}: Nelson Run Rule 5",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule5($minus2sd, $plus2sd, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule5($minus2sd, $plus2sd, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus2sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -2 Sigma"
                     ],
@@ -614,11 +619,11 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
             {
                 "Name": f"{signal_name}: Nelson Run Rule 6",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule6($minus1sd, $plus1sd, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule6($minus1sd, $plus1sd, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus1sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -1 Sigma"
                     ],
@@ -630,11 +635,11 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
             {
                 "Name": f"{signal_name}: Nelson Run Rule 7",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule7($minus1sd, $plus1sd, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule7($minus1sd, $plus1sd, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus1sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -1 Sigma"
                     ],
@@ -646,11 +651,11 @@ def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, si
             {
                 "Name": f"{signal_name}: Nelson Run Rule 8",
                 "Type": "Condition",
-                "Formula": f"$inputsignal.NelsonRunRules{ADD_ON_SUFFIX}_RunRule8($minus1sd, $plus1sd, "
+                "Formula": f"$inputsignal{input_coercion_fragment}.NelsonRunRules{ADD_ON_SUFFIX}_RunRule8($minus1sd, $plus1sd, "
                 + interp_value
                 + ")",
                 "Formula Parameters": {
-                    "$inputsignal": signals[signals["Name"] == signal_name],
+                    "$inputsignal": input_signal,
                     "$minus1sd": limits_push_df[
                         limits_push_df["Name"] == f"{signal_name}: -1 Sigma"
                     ],
