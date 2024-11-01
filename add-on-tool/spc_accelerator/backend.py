@@ -481,7 +481,7 @@ def western_electric_df(
 ):
     input_signal = signals[signals["Name"] == signal_name]
     # in order to handle discrete, we want to coerce to step using the max interp specified on the UI
-    is_discrete = input_signal["Interpolation Method"] == "None"
+    is_discrete = (input_signal["Interpolation Method"] == "None").any()
     input_coercion_fragment = f".toStep({interp_value})" if is_discrete else ""
     western_electric_rules_df = pd.DataFrame(
         [
@@ -552,7 +552,7 @@ def western_electric_df(
 def nelson_df(limits_push_df, mean_stddev_push_df, signal_name, interp_value, signals):
     input_signal = signals[signals["Name"] == signal_name]
     # in order to handle discrete, we want to coerce to step using the max interp specified on the UI
-    is_discrete = input_signal["Interpolation Method"] == "None"
+    is_discrete = (input_signal["Interpolation Method"] == "None").any()
     input_coercion_fragment = f".toStep({interp_value})" if is_discrete else ""
 
     nelson_rules_df = pd.DataFrame(

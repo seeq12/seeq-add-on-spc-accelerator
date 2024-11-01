@@ -13,7 +13,7 @@ def pull_worksheet_data(URL, workbook_id, worksheet_id):
         signals = worksheet_items[worksheet_items["Type"].str.contains("Signal")]
         signal_list = signals["Name"].to_list()
         signals_with_properties = spy.search(
-            signals, include_properties=["Interpolation Method"]
+            signals, include_properties=["Interpolation Method"], quiet=True
         )
         conditions = worksheet_items[worksheet_items["Type"].str.contains("Condition")]
         condition_list = conditions["Name"].to_list()
