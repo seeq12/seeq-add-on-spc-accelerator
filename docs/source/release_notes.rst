@@ -20,6 +20,10 @@ Release Notes
    * - 1.0.2
      - Add-on now skips full workbook inventory pushes and pulls
      - 
+  
+   * - 1.0.3
+     - Update default Python kernel to Python 3.11
+     -      
 
    * - 1.1.0
      - Discrete signals are now supported
