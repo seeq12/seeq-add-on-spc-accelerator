@@ -28,3 +28,7 @@ Release Notes
    * - 1.1.0
      - Discrete signals are now supported
      - 
+
+   * - 1.1.1
+     - Fixed bug where string capsule properties that start with a number caused add-on to hang
+     - 
