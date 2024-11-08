@@ -270,11 +270,14 @@ def create_mean_formula_string(
         output_string = "\n \n//Create average for all grades in one signal using splice(), use keep() to filter the condition by the specific grade code capsule property\n//use within() to show only average only during the condition\n0"
         # iterate through each unique property value to add to the average formula
         for prop in unique_properties:
-            if isinstance(prop, str) and prop and prop[0].isalpha():
-                property_text = re.sub(r"\W+", "", prop)
+            # case if property is a string (not a number), wrap the match in quotes
+            # this should really be using capsule property metadata...
+            if isinstance(prop, str) and prop and not prop.isdigit():
+                property_text = "prop_" + re.sub(r"\W+", "", prop)
                 prop_match = "'" + prop + "'"
+            # case if property is a number, no quotes required
             else:
-                property_text = "a" + re.sub(r"\W+", "", str(prop))
+                property_text = "prop_" + re.sub(r"\W+", "", str(prop))
                 prop_match = prop
             in_control_string += f"${property_text} = $applytocondition.keep('{capsule_property.v_model}', isMatch({prop_match})).intersect($inputcondition)\n"
             unweighted_average_string += f"${property_text}_average = $inputsignal.remove(not ${property_text}).toDiscrete().average($capsule)\n"
